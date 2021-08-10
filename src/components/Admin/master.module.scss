@@ -1,0 +1,29 @@
+.root {
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+}
+.wrapper {
+  margin: 50px auto 0px auto;
+  overflow-x: hidden;
+  padding: 15px;
+}
+.flex {
+  display: flex;
+  height: 100%;
+}
+.background {
+  display: none;
+}
+@media (max-width: 1024px) {
+  .background {
+    display: block;
+    position: fixed;
+    z-index: 777;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba($color: #000000, $alpha: 0.5);
+  }
+}
