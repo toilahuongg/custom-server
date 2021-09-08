@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 import useStore from '../../../stores';
-import CustomButton from '../../Button';
+import CustomButton from '../Button';
 
 type TProps = {
   active: boolean

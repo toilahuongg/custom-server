@@ -4,8 +4,8 @@ import TCategory from '../models/category/type';
 
 export const postCategory = async (ctx: Context) => {
   try {
-    const { title, description, type } = ctx.request.body as TCategory;
-    const result = await CategoryModel.create({ title, description, type });
+    const { title, description, parentId, type } = ctx.request.body as TCategory;
+    const result = await CategoryModel.create({ title, description, parentId, type });
     ctx.body = result;
   } catch (error) {
     console.log(error);

@@ -5,10 +5,10 @@ import { ArrowReturnLeft } from 'react-bootstrap-icons';
 import { useRouter } from 'next/router';
 import { observer } from 'mobx-react';
 import { toast } from 'react-toastify';
-import Master from '../../../src/components/Admin/Master';
+import AdminLayout from '../../../src/components/Admin';
 import FormArticle from '../../../src/components/Admin/Article/FormArticle';
 import useStore from '../../../src/stores';
-import CustomButton from '../../../src/components/Button';
+import CustomButton from '../../../src/components/Admin/Button';
 
 const CreateArticlePage: React.FC = () => {
   const router = useRouter();
@@ -32,7 +32,7 @@ const CreateArticlePage: React.FC = () => {
     return () => applySnapshot(detailArticle, {});
   }, []);
   return (
-    <Master title="New Article">
+    <AdminLayout title="New Article">
       <div className="d-flex justify-content-between mb-3">
         <Button variant="outline-dark" onClick={back}> <ArrowReturnLeft /> </Button>
         <div>
@@ -42,7 +42,7 @@ const CreateArticlePage: React.FC = () => {
         </div>
       </div>
       <FormArticle />
-    </Master>
+    </AdminLayout>
   );
 };
 export default observer(CreateArticlePage);

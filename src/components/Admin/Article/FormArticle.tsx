@@ -14,7 +14,10 @@ const YoutubeEmbed = ({ attrs }) => {
     />
   );
 };
-const FormArticle: React.FC = () => {
+type TProps = {
+  keyEditor?: string,
+};
+const FormArticle: React.FC<TProps> = ({ keyEditor }) => {
   const { article } = useStore();
   const { detailArticle } = article;
   const { title, content, setTitle, setContent } = detailArticle;
@@ -25,6 +28,7 @@ const FormArticle: React.FC = () => {
       </div>
       <div className={styles.formContent}>
         <Editor
+          key={keyEditor}
           defaultValue={content}
           onSave={(options) => console.log('Save triggered', options)}
           onCancel={() => console.log('Cancel triggered')}

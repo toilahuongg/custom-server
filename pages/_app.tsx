@@ -25,6 +25,7 @@ const App: React.FC<AppProps> = ({ Component, pageProps }) => {
   Router.events.on('routeChangeComplete', () => {
     setProgress(false);
   });
+
   return (
     <>
       {progress && <TopBarProgress />}

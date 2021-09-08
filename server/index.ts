@@ -5,7 +5,7 @@ import serve from 'koa-static';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import bodyParser from 'koa-bodyparser';
-import publicRouter from './routers/publicRouter';
+import routerApi from './routers';
 
 dotenv.config();
 
@@ -32,9 +32,9 @@ const run = async () => {
     const router = new Router();
 
     router.use(bodyParser());
-    server.use(serve(`${__dirname}/static`));
-    router.use(publicRouter.routes());
-
+    server.use(serve(`${__dirname}/public`));
+    router.use('/api', routerApi.routes());
+    console.log(router.stack.map((i) => i.path));
     router.all('(.*)', async (ctx: Context) => {
       await handle(ctx.req, ctx.res);
       ctx.respond = false;

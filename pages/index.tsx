@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import Master from '../src/components/Admin/Master';
 
 const HomePage: React.FC = () => {
   useEffect(() => {
@@ -7,9 +6,9 @@ const HomePage: React.FC = () => {
     return () => console.log('didmount');
   }, []);
   return (
-    <Master>
+    <>
       hii
-    </Master>
+    </>
   );
 };
 

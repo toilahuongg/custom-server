@@ -1,15 +1,11 @@
-import React, { useEffect } from 'react';
-import Master from '../../src/components/Admin/Master';
+import React from 'react';
+import AdminLayout from '../../src/components/Admin';
 
 const AdminPage: React.FC = () => {
-  useEffect(() => {
-    console.log('Home loaded');
-    return () => console.log('didmount');
-  }, []);
   return (
-    <Master title="Trang chủ">
+    <AdminLayout title="Trang chủ">
       Trang chủ
-    </Master>
+    </AdminLayout>
   );
 };
 
