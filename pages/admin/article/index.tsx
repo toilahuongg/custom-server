@@ -21,10 +21,10 @@ import ArticleModel from '../../../server/models/article';
 
 import useStore from '../../../src/stores';
 import DataTable from '../../../src/components/Admin/DataTable';
-import Master from '../../../src/components/Admin/Master';
+import AdminLayout from '../../../src/components/Admin';
 import Card from '../../../src/components/Admin/Card';
 import ModalDeleteArticle from '../../../src/components/Admin/Article/ModalDeleteArticle';
-import CustomButton from '../../../src/components/Button';
+import CustomButton from '../../../src/components/Admin/Button';
 import CustomPagination from '../../../src/components/Admin/Pagination';
 import { toastErrorMessage } from '../../../src/helper/common';
 
@@ -218,7 +218,7 @@ const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
   }, [page, limit, s]);
 
   return (
-    <Master title="List Article">
+    <AdminLayout title="List Article">
       <Card>
         <div className="d-flex justify-content-between">
           <div>
@@ -272,10 +272,11 @@ const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
         rows={rows}
         loading={loading}
         sortable={actionSortArticle}
+        className="my-3"
       />
       <CustomPagination countPage={countPage} currentPage={parseInt(page, 10)} limit={parseInt(limit, 10)} />
       <ModalDeleteArticle active={active} toggleModal={toggleModal} action={actionDeleteArticle} />
-    </Master>
+    </AdminLayout>
   );
 };
 export default observer(ArticlePage);

@@ -7,6 +7,12 @@ const CategorySchema = new Schema<TCategory>({
     required: true,
   },
   description: { type: String },
+  parentId: { type: mongoose.Types.ObjectId, transform: (v: any) => (v == null ? '' : v) },
+  slug: {
+    type: String,
+    index: true,
+    unique: true,
+  },
   type: { type: String },
 }, { timestamps: true });
 const CategoryModel = mongoose.models.category || mongoose.model('category', CategorySchema);

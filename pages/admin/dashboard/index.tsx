@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { Cart, CurrencyDollar, Envelope, People } from 'react-bootstrap-icons';
 import Box from '../../../src/components/Admin/Dashboard/Box';
-import Master from '../../../src/components/Admin/Master';
+import AdminLayout from '../../../src/components/Admin';
 
 const DashboardPage: React.FC = () => {
   useEffect(() => {
@@ -10,7 +10,7 @@ const DashboardPage: React.FC = () => {
     return () => console.log('didmount');
   }, []);
   return (
-    <Master title="Dashboard">
+    <AdminLayout title="Dashboard">
       <Row>
         <Col sm="6" lg="3">
           <Box background="blue" count="8765" process="50" icon={Cart} />
@@ -25,7 +25,7 @@ const DashboardPage: React.FC = () => {
           <Box background="red" count="999" process="80" icon={Envelope} />
         </Col>
       </Row>
-    </Master>
+    </AdminLayout>
   );
 };
 

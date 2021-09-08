@@ -9,14 +9,17 @@ type THeading = {
   label: number | string | ReactNode
 };
 type Row = number | string | ReactNode;
-type TProps = {
+type TProps = React.HTMLAttributes<HTMLElement> & {
   headings: THeading[],
   rows: Row[][],
   loading?: boolean,
   sortable: ({ oldIndex, newIndex }) => void,
 };
 
-const DataTable: React.FC<TProps> = ({ headings, rows, loading, sortable }) => {
+const DataTable: React.FC<TProps> = ({
+  headings, rows, loading, sortable, ...props
+}) => {
+  const { className } = props;
   const element = useRef<HTMLTableSectionElement>(null);
   useEffect(() => {
     Sortable.create(element.current, {
@@ -28,7 +31,7 @@ const DataTable: React.FC<TProps> = ({ headings, rows, loading, sortable }) => {
   }, []);
 
   return (
-    <div className={styles.card}>
+    <div {...props} className={`${styles.card} ${className}`}>
       <Table hover responsive>
         <thead>
           <tr>
