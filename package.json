@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=development ts-node --project tsconfig.server.json server/index.ts",
-    "build": "next build",
-    "start": "NODE_ENV=production ts-node --project tsconfig.server.json server/index.ts"
+    "build:server": "tsc --project tsconfig.server.json",
+    "build:next": "next build",
+    "build": "npm run build:next && npm run build:server",
+    "start": "NODE_ENV=production node dist/index.js"
   },
   "author": "",
   "license": "ISC",
