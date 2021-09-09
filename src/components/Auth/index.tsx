@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react';
 import { useRouter } from 'next/router';
 import instance from '../../helper/instance';
+import Loading from '../Loading';
 
 type TProps = {
   children?:
@@ -27,7 +28,7 @@ const Auth: React.FC<TProps> = ({ children }) => {
     };
     run();
   }, []);
-  return !isAuth || loading ? <> Loading ... </> : (
+  return !isAuth || loading ? <Loading /> : (
     <>
       {children}
     </>

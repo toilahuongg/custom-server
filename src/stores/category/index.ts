@@ -1,4 +1,7 @@
-import { Instance, SnapshotOut, types } from 'mobx-state-tree';
+import {
+  applySnapshot, flow, getSnapshot, Instance, SnapshotOut, types,
+} from 'mobx-state-tree';
+import instance from '../../helper/instance';
 
 const CategoryModel = types.model({
   _id: types.optional(types.string, ''),
@@ -24,6 +27,23 @@ export const CategoryModels = types.model({
     setLoading: (value: boolean) => {
       self.loading = value;
     },
+    actionCategory: flow(function* (type?: string) {
+      try {
+        const data = getSnapshot(self.detailCategory);
+        if (type === 'edit') {
+          yield instance.put(`/category/${data._id}`, data);
+          const idx = self.listCategory.findIndex((item) => item._id === data._id);
+          if (idx !== -1) applySnapshot(self.listCategory[idx], data);
+        } else {
+          const response = yield instance.post('/category', data);
+          if (self.listCategory.length) applySnapshot(self.listCategory, [response.data, ...self.listArticle]);
+        }
+      } catch (error) {
+        console.error(error);
+        if (error.response) throw error.response.data;
+        else throw error;
+      }
+    }),
   }));
 
 export interface ICategoryModel extends Instance<typeof CategoryModel> {}

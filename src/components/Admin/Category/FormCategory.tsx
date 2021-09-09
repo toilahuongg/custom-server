@@ -1,18 +1,12 @@
 import { observer } from 'mobx-react';
-import React, { MouseEvent } from 'react';
+import React from 'react';
 import { Form } from 'react-bootstrap';
 import useStore from '../../../stores';
-import CustomButton from '../Button';
 
-type TProps = {
-  action: (e: MouseEvent) => void,
-};
-const FormCategory: React.FC<TProps> = ({ action }) => {
+const FormCategory: React.FC = () => {
   const { category } = useStore();
   const { detailCategory } = category;
-  const {
-    loading, title, description, setTitle, setDescription,
-  } = detailCategory;
+  const { title, description, setTitle, setDescription } = detailCategory;
   return (
     <Form>
       <Form.Group className="mb-3" controlId="formTitle">
@@ -44,9 +38,6 @@ const FormCategory: React.FC<TProps> = ({ action }) => {
           onChange={(e) => setDescription(e.target.value)}
         />
       </Form.Group>
-      <CustomButton onClick={action} variant="primary" type="submit" loading={loading}>
-        Save
-      </CustomButton>
     </Form>
   );
 };
