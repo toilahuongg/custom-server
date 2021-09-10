@@ -27,6 +27,15 @@ export const CategoryModels = types.model({
     setLoading: (value: boolean) => {
       self.loading = value;
     },
+    getArticles: flow(function* ({ page, limit, s }) {
+      try {
+        const response = yield instance.get('/category', { params: { page, limit, s } });
+        self.listCategory = response.data;
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    }),
     actionCategory: flow(function* (type?: string) {
       try {
         const data = getSnapshot(self.detailCategory);
@@ -36,7 +45,7 @@ export const CategoryModels = types.model({
           if (idx !== -1) applySnapshot(self.listCategory[idx], data);
         } else {
           const response = yield instance.post('/category', data);
-          if (self.listCategory.length) applySnapshot(self.listCategory, [response.data, ...self.listArticle]);
+          self.listCategory.unshift(response.data);
         }
       } catch (error) {
         console.error(error);

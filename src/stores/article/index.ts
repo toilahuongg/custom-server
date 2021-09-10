@@ -51,7 +51,7 @@ export const ArticleModels = types.model({
           if (idx !== -1) applySnapshot(self.listArticle[idx], data);
         } else {
           const response = yield instance.post('/article', data);
-          if (self.listArticle.length) applySnapshot(self.listArticle, [response.data, ...self.listArticle]);
+          self.listArticle.unshift(response.data);
         }
       } catch (error) {
         console.error(error);

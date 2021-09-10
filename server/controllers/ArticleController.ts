@@ -6,9 +6,10 @@ import TArticle from '../models/article/type';
 export const getArticleByQuery = async (ctx: Context) => {
   try {
     const { page, limit, s } = ctx.query;
+    const search: string = s as string || '';
     const l = parseInt(limit as string, 10) || 15;
     const p = parseInt(page as string, 10) > 0 ? parseInt(page as string, 10) - 1 : 0;
-    const result = await Article.find({ title: { $regex: `.*${s}.*` } }).sort({ index: -1 }).skip(p * l).limit(l)
+    const result = await Article.find({ title: { $regex: `.*${search}.*` } }).sort({ index: -1 }).skip(p * l).limit(l)
       .lean();
     ctx.body = result;
   } catch (error) {
