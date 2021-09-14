@@ -1,14 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import AdminLayout from '@src/components';
 
 const HomePage: React.FC = () => {
-  useEffect(() => {
-    console.log('Home loaded');
-    return () => console.log('didmount');
-  }, []);
   return (
-    <>
-      hii
-    </>
+    <AdminLayout title="Trang chủ">
+      Trang chủ
+    </AdminLayout>
   );
 };
 

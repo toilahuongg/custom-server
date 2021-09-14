@@ -8,7 +8,13 @@ import {
   deleteArticles,
   swapArticle,
 } from '../controllers/ArticleController';
-import { postCategory } from '../controllers/CategoryController';
+import {
+  deleteCategories,
+  deleteCategory,
+  postCategory,
+  putCategory,
+  swapCategory, 
+} from '../controllers/CategoryController';
 
 const router = new Router();
 router.use(verifyToken);
@@ -30,6 +36,10 @@ router.use('/article', articleRouter.routes());
 // Category
 const categoryRouter = new Router();
 categoryRouter.post('/', postCategory);
+categoryRouter.put('/:id', putCategory);
+categoryRouter.delete('/:id', deleteCategory);
+categoryRouter.delete('/', deleteCategories);
+categoryRouter.post('/swap', swapCategory);
 router.use('/category', categoryRouter.routes());
 
 export default router;

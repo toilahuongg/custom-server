@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import Header from './Header';
 import styles from './admin.module.scss';
 import Sidebar from './Sidebar';
-import CustomHead from '../CustomHead';
-import Auth from '../Auth';
+import CustomHead from '@src/components/CustomHead';
+import Auth from '@src/components/Auth';
+import SidebarContext from '@src/components/Sidebar/models';
+import { observer } from 'mobx-react';
 
 type TProps = {
   children?:
@@ -12,21 +14,20 @@ type TProps = {
   title?: string,
 };
 const AdminLayout:React.FC<TProps> = ({ children, title }) => {
-  const [active, setActive] = useState<boolean>(false);
-  const toggleActive = () => setActive(!active);
+  const { isShowSidebar, toggleIsShowSidebar } = useContext(SidebarContext);
   return (
     <Auth>
       <CustomHead title={title} />
       <div className={styles.flex}>
-        <Sidebar active={active} />
-        { active && (
+        <Sidebar />
+        { isShowSidebar && (
         <div
           className={styles.background}
-          onClick={toggleActive}
+          onClick={toggleIsShowSidebar}
         />
         )}
         <div className={styles.root}>
-          <Header action={toggleActive} />
+          <Header action={toggleIsShowSidebar} />
           <div className={styles.wrapper}>
             {children}
           </div>
@@ -35,4 +36,4 @@ const AdminLayout:React.FC<TProps> = ({ children, title }) => {
     </Auth>
   );
 };
-export default AdminLayout;
+export default observer(AdminLayout);

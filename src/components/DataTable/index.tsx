@@ -13,11 +13,12 @@ type TProps = React.HTMLAttributes<HTMLElement> & {
   headings: THeading[],
   rows: Row[][],
   loading?: boolean,
-  sortable: ({ oldIndex, newIndex }) => void,
+  listenChange: ({ oldIndex, newIndex }) => void,
+  listenEnd: () => Promise<void>,
 };
 
 const DataTable: React.FC<TProps> = ({
-  headings, rows, loading, sortable, ...props
+  headings, rows, loading, listenChange, listenEnd, ...props
 }) => {
   const { className } = props;
   const element = useRef<HTMLTableSectionElement>(null);
@@ -26,7 +27,8 @@ const DataTable: React.FC<TProps> = ({
       group: 'sorting',
       handle: '.handle',
       sort: true,
-      onChange: sortable,
+      onChange: listenChange,
+      onEnd: listenEnd,
     });
   }, []);
 

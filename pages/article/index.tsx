@@ -16,28 +16,29 @@ import moment from 'moment';
 import { applySnapshot } from 'mobx-state-tree';
 import { toast } from 'react-toastify';
 
-import database from '../../../server/utils/database';
-import ArticleModel from '../../../server/models/article';
+import database from '@server/utils/database';
+import ArticleModel from '@server/models/article';
 
-import useStore from '../../../src/stores';
-import DataTable from '../../../src/components/Admin/DataTable';
-import AdminLayout from '../../../src/components/Admin';
-import Card from '../../../src/components/Admin/Card';
-import ModalDeleteArticle from '../../../src/components/Admin/Article/ModalDeleteArticle';
-import CustomButton from '../../../src/components/Admin/Button';
-import CustomPagination from '../../../src/components/Admin/Pagination';
-import { toastErrorMessage } from '../../../src/helper/common';
+import useStore from '@src/stores';
+import DataTable from '@src/components/DataTable';
+import AdminLayout from '@src/components';
+import Card from '@src/components/Card';
+import ModalDeleteArticle from '@src/components/Article/ModalDeleteArticle';
+import CustomButton from '@src/components/Button';
+import CustomPagination from '@src/components/Pagination';
+import { toastErrorMessage } from '@src/helper/common';
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
   await database();
   const countPage = await ArticleModel.count();
   const { query } = context;
-  const { page, limit, s } = query;
+  const { page, limit, s, category } = query;
   return {
     props: {
       page: page as string || '1',
       limit: limit as string || '15',
       s: s as string || '',
+      category: category as string || '',
       countPage,
     },
   };
@@ -56,9 +57,10 @@ const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
   const [active, setActive] = useState<boolean>(false);
   const [loadingClone, setLoadingClone] = useState<boolean[]>([]);
   const [loadingDeleteArticles, setLoadingDeleteArticles] = useState<boolean>(false);
+  const [treeCategory, setTreeCategory] = useState([]);
   const typingTimeoutRef = useRef(null);
   const swappingTimeoutRef = useRef(null);
-  const { article } = useStore();
+  const { article, category } = useStore();
   const {
     loading,
     listArticle,
@@ -70,10 +72,12 @@ const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
     deleteArticle,
     deleteArticles,
     sortArticle,
-    actionSelectArticle,
+    selectArticles,
+    actionSelectArticles,
     checkSelectArticle,
     checkSelectAll,
   } = article;
+  const { getTreeCategories } = category;
   const toggleModal = () => setActive(!active);
 
   const handleClickDelete = (id: string) => {
@@ -147,10 +151,10 @@ const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
   const headings = [
     {
       size: '5%',
-      label: <Form.Check type="checkbox" onChange={() => actionSelectArticle('select-all')} checked={checkSelectAll()} />,
+      label: <Form.Check type="checkbox" onChange={() => actionSelectArticles('select-all')} checked={checkSelectAll()} />,
     },
     {
-      size: '20%',
+      size: '35%',
       label: 'Title',
     },
     {
@@ -158,18 +162,18 @@ const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
       label: 'Description',
     },
     {
-      size: '25%',
-      label: 'Time',
+      size: '15%',
+      label: 'Date',
     },
     {
-      size: '20%',
+      size: '15%',
       label: 'Actions',
     },
   ];
 
   const rows = listArticle.map((item) => [
-    <Form.Check type="checkbox" onChange={() => actionSelectArticle('select-article', item._id)} checked={checkSelectArticle(item._id)} />,
-    <Link href={`/admin/article/${item._id}/edit`}>
+    <Form.Check type="checkbox" onChange={() => actionSelectArticles('select-article', item._id)} checked={checkSelectArticle(item._id)} />,
+    <Link href={`/article/${item._id}/edit`}>
       <a>
         {item.title}
       </a>
@@ -177,27 +181,26 @@ const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
     item.description,
     (
       <>
-        <small><b>Created at:</b> {moment(item.createdAt).format('lll')} </small> <br />
-        <small><b>Updated at:</b> {moment(item.updatedAt).format('lll')} </small>
+        {moment(item.createdAt).format('lll')}
       </>
     ),
     (
       <ButtonGroup>
         <CustomButton size="sm" variant="link" onClick={() => actionCloneArticle(item._id)} loading={loadingClone[item._id]}>
-          <Back color="#716F81" size="20" />
+          <Back color="#716F81" size="16" />
         </CustomButton>
-        <Button size="sm" variant="link" onClick={() => handleClickDelete(item._id)}>
-          <Trash color="red" size="20" />
-        </Button>
         <Button size="sm" variant="link">
-          <Link href={`/admin/article/${item._id}/edit`}>
+          <Link href={`/article/${item._id}/edit`}>
             <a>
-              <PencilSquare color="blue" size="20" />
+              <PencilSquare color="blue" size="16" />
             </a>
           </Link>
         </Button>
+        <Button size="sm" variant="link" onClick={() => handleClickDelete(item._id)}>
+          <Trash color="red" size="16" />
+        </Button>
         <Button size="sm" variant="link" className="handle" style={{ cursor: 'all-scroll' }}>
-          <GripVertical color="#000" size="20" />
+          <GripVertical color="#000" size="16" />
         </Button>
       </ButtonGroup>
     )]);
@@ -205,7 +208,7 @@ const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
   const run = async () => {
     try {
       setLoading(true);
-      await getArticles({ page, limit, s });
+      await getArticles({ page, limit, s, category });
     } catch (error) {
       console.log(error);
     } finally {
@@ -215,14 +218,31 @@ const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
 
   useEffect(() => {
     run();
-  }, [page, limit, s]);
+    return () => {
+      applySnapshot(detailArticle, {});
+      applySnapshot(selectArticles, []);
+    };
+  }, [page, limit, s, category]);
+
+  useEffect(() => {
+    const run = async () => {
+      try {
+        const options = await getTreeCategories();
+        console.log(options);
+        setTreeCategory(options);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    run();
+  }, []);
 
   return (
     <AdminLayout title="List Article">
       <Card>
         <div className="d-flex justify-content-between">
           <div>
-            <Link href="/admin/article/create">
+            <Link href="/article/create">
               <Button>
                 <PlusSquare /> New Article
               </Button>
@@ -256,11 +276,17 @@ const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
                 </Form.Select>
               </Col>
               <Col sm="4">
-                <Form.Select aria-label="Select Category" onChange={() => {}}>
-                  <option value="15">Choose category</option>
-                  <option value="15">15</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
+                <Form.Select
+                  aria-label="Select Category"
+                  onChange={(e: FormEvent<HTMLSelectElement>) => {
+                    const target = e.target as HTMLSelectElement;
+                    router.push({ query: { ...query, category: target.value, page: '1' } });
+                  }}
+                >
+                  <option value="">Choose Category</option>
+                  {
+                    treeCategory.map((option) => <option value={option.value} key={option.value}> {option.label} </option>)
+                  }
                 </Form.Select>
               </Col>
             </Row>

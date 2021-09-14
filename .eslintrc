@@ -56,5 +56,6 @@
     "no-return-assign": "off",
     "@typescript-eslint/no-shadow": "off",
     "@typescript-eslint/naming-convention": "off"
-  }
+  },
+  "plugins": ["import", "react"]
 }

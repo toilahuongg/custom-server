@@ -3,7 +3,6 @@ import axios from 'axios';
 let token = null;
 if (typeof window !== 'undefined') {
   token = window.localStorage.getItem('access-token');
-  console.log(token);
 }
 const instance = axios.create({
   baseURL: '/api',

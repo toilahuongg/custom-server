@@ -1,14 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { Cart, CurrencyDollar, Envelope, People } from 'react-bootstrap-icons';
-import Box from '../../../src/components/Admin/Dashboard/Box';
-import AdminLayout from '../../../src/components/Admin';
+import Box from '@src/components/Dashboard/Box';
+import AdminLayout from '@src/components';
 
 const DashboardPage: React.FC = () => {
-  useEffect(() => {
-    console.log('Home loaded');
-    return () => console.log('didmount');
-  }, []);
   return (
     <AdminLayout title="Dashboard">
       <Row>

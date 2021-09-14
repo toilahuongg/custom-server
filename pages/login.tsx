@@ -1,9 +1,9 @@
 import { observer } from 'mobx-react';
 import React, { FormEvent } from 'react';
 import { Card, Form } from 'react-bootstrap';
-import CustomButton from '../../src/components/Admin/Button';
-import CustomHead from '../../src/components/CustomHead';
-import { useUser } from '../../src/hooks/user';
+import CustomButton from '@src/components/Button';
+import CustomHead from '@src/components/CustomHead';
+import { useUser } from '@src/hooks/user';
 
 const LoginPage: React.FC = () => {
   const {
@@ -14,7 +14,7 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     try {
       await login();
-      window.location.href = '/admin';
+      window.location.href = '/';
     } catch (error) {
       console.log(error);
     }

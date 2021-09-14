@@ -16,8 +16,7 @@ const Auth: React.FC<TProps> = ({ children }) => {
   useEffect(() => {
     const run = async () => {
       try {
-        const response = await instance.get('/user/get-info');
-        console.log(response.data);
+        await instance.get('/user/get-info');
         setIsAuth(true);
       } catch (error) {
         console.log(error);

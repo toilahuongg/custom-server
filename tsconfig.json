@@ -5,6 +5,11 @@
       "dom",
       "esnext"
     ],
+    "baseUrl": ".",
+    "paths": {
+      "@src/*": ["src/*"],
+      "@server/*": ["server/*"]
+    },
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,

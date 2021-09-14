@@ -1,6 +1,7 @@
 import {
-  applySnapshot, cast, flow, getSnapshot, Instance, SnapshotOut, types,
+  applySnapshot, cast, flow, getParent, getSnapshot, Instance, SnapshotOut, types,
 } from 'mobx-state-tree';
+import { IStoreModel } from '..';
 import instance from '../../helper/instance';
 
 export const ArticleModel = types.model({
@@ -26,16 +27,16 @@ export const ArticleModel = types.model({
 export const ArticleModels = types.model({
   detailArticle: types.optional(ArticleModel, {}),
   listArticle: types.array(ArticleModel),
-  selectArticle: types.array(types.optional(types.string, '')),
+  selectArticles: types.array(types.optional(types.string, '')),
 })
   .volatile<{ loading: boolean }>(() => ({ loading: false }))
   .actions((self) => ({
     setLoading: (value: boolean) => {
       self.loading = value;
     },
-    getArticles: flow(function* ({ page, limit, s }) {
+    getArticles: flow(function* (params) {
       try {
-        const response = yield instance.get('/article', { params: { page, limit, s } });
+        const response = yield instance.get('/article', { params });
         self.listArticle = response.data;
       } catch (error) {
         console.log(error);
@@ -44,7 +45,12 @@ export const ArticleModels = types.model({
     }),
     actionArticle: flow(function* (type?: string) {
       try {
-        const data = getSnapshot(self.detailArticle);
+        const { category } = getParent(self, 1) as IStoreModel;
+        const { selectCategories } = category;
+        const data = {
+          ...getSnapshot(self.detailArticle),
+          categories: [...selectCategories],
+        };
         if (type === 'edit') {
           yield instance.put(`/article/${data._id}`, data);
           const idx = self.listArticle.findIndex((item) => item._id === data._id);
@@ -71,10 +77,10 @@ export const ArticleModels = types.model({
     }),
     deleteArticles: flow(function* () {
       try {
-        const data = getSnapshot(self.selectArticle);
+        const data = getSnapshot(self.selectArticles);
         yield instance.delete('/article/', { data });
         self.listArticle = cast(self.listArticle.filter((article) => !data.includes(article._id)));
-        self.selectArticle = cast([]);
+        self.selectArticles = cast([]);
       } catch (error) {
         console.log(error);
         throw (error);
@@ -85,7 +91,7 @@ export const ArticleModels = types.model({
         const data = { ...self.listArticle.find((item) => item._id === id) };
         data.title += ' (Sao chép)';
         const response = yield instance.post('/article', data);
-        applySnapshot(self.listArticle, [response.data, ...self.listArticle]);
+        self.listArticle.unshift(response.data);
       } catch (error) {
         console.error(error);
         if (error.response) throw error.response.data;
@@ -103,18 +109,20 @@ export const ArticleModels = types.model({
           articleTwo: { _id: articleTwo._id, index: articleTwo.index },
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
+        if (error.response) throw error.response.data;
+        else throw error;
       }
     }),
-    actionSelectArticle: (type: string, id?: string) => {
+    actionSelectArticles: (type: string, id?: string) => {
       if (type === 'select-all') {
         const listId = self.listArticle.map((item) => item._id);
-        if (self.selectArticle.length === listId.length) self.selectArticle = cast([]);
-        else self.selectArticle = cast(listId);
+        if (self.selectArticles.length === listId.length) self.selectArticles = cast([]);
+        else self.selectArticles = cast(listId);
       } else {
-        const index = self.selectArticle.indexOf(id);
-        if (index === -1) self.selectArticle.push(id);
-        else self.selectArticle.splice(index, 1);
+        const index = self.selectArticles.indexOf(id);
+        if (index === -1) self.selectArticles.push(id);
+        else self.selectArticles.splice(index, 1);
       }
     },
   })).views((self) => ({
@@ -122,11 +130,11 @@ export const ArticleModels = types.model({
       return self.listArticle.find((item) => item._id === id);
     },
     checkSelectArticle: (id: string) => {
-      return self.selectArticle.includes(id);
+      return self.selectArticles.includes(id);
     },
     checkSelectAll: () => {
       const listId = self.listArticle.map((item) => item._id);
-      return self.selectArticle.length === listId.length;
+      return self.selectArticles.length > 0 && self.selectArticles.length === listId.length;
     },
   }));
 export interface IArticleModel extends Instance<typeof ArticleModel> { }

@@ -23,7 +23,7 @@ router.use('/user', userRouter.routes());
 // Category
 const categoryRouter = new Router();
 categoryRouter.get('/', getCategoryByQuery);
-categoryRouter.get('/parent', getListCategoryParent);
+categoryRouter.get('/tree', getListCategoryParent);
 router.use('/category', categoryRouter.routes());
 
 export default router;

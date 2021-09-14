@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
-import useStore from '../../../stores';
+import useStore from '../../stores';
 import CustomButton from '../Button';
 
 type TProps = {
@@ -8,10 +8,10 @@ type TProps = {
   toggleModal: () => void,
   action: () => void,
 };
-const ModalDeleteArticle: React.FC<TProps> = ({ active, toggleModal, action }) => {
-  const { article } = useStore();
-  const { detailArticle } = article;
-  const { title, loading } = detailArticle;
+const ModalDeleteCategory: React.FC<TProps> = ({ active, toggleModal, action }) => {
+  const { category } = useStore();
+  const { detailCategory } = category;
+  const { title, loading } = detailCategory;
   return (
     <Modal
       show={active}
@@ -34,4 +34,4 @@ const ModalDeleteArticle: React.FC<TProps> = ({ active, toggleModal, action }) =
     </Modal>
   );
 };
-export default ModalDeleteArticle;
+export default ModalDeleteCategory;

@@ -1,12 +1,24 @@
 .sidebar {
   min-width: 300px;
-  background: rgb(237 242 247);
-  padding: 10px;
   transition: .3s cubic-bezier(0.075, 0.82, 0.165, 1);
-  &.active {
-    margin-left: -300px;
+  margin-left: -300px;
+  position: relative;
+  .wrapper {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 300px;
+    padding: 10px;
+    height: 100%;
+    background: rgb(237 242 247);
+    transition: .3s cubic-bezier(0.075, 0.82, 0.165, 1);
   }
-  overflow-y: auto;
+  &.active {
+    margin-left: 0;
+    .wrapper {
+      left: 0;
+    }
+  }
 }
 .list {
   padding: 5px;

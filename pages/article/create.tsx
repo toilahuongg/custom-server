@@ -1,21 +1,21 @@
-import React, { MouseEvent, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { applySnapshot } from 'mobx-state-tree';
 import { Button } from 'react-bootstrap';
 import { ArrowReturnLeft } from 'react-bootstrap-icons';
 import { useRouter } from 'next/router';
 import { observer } from 'mobx-react';
 import { toast } from 'react-toastify';
-import AdminLayout from '../../../src/components/Admin';
-import FormArticle from '../../../src/components/Admin/Article/FormArticle';
-import useStore from '../../../src/stores';
-import CustomButton from '../../../src/components/Admin/Button';
+import AdminLayout from '@src/components';
+import FormArticle from '@src/components/Article/FormArticle';
+import useStore from '@src/stores';
+import CustomButton from '@src/components/Button';
 
 const CreateArticlePage: React.FC = () => {
   const router = useRouter();
   const { article } = useStore();
   const { loading, detailArticle, setLoading, actionArticle } = article;
-  const back = () => router.push('/admin/article');
-  const handleClick = async (e: MouseEvent) => {
+  const back = () => router.push('/article');
+  const handleClick = async (e: React.MouseEvent) => {
     try {
       e.preventDefault();
       setLoading(true);

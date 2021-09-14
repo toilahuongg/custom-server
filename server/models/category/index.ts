@@ -13,6 +13,8 @@ const CategorySchema = new Schema<TCategory>({
     index: true,
     unique: true,
   },
+  articles: [{ type: mongoose.Types.ObjectId, ref: 'categories' }],
+  index: { type: Number, unique: false },
   type: { type: String },
 }, { timestamps: true });
 const CategoryModel = mongoose.models.category || mongoose.model('category', CategorySchema);

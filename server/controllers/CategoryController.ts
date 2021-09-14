@@ -1,16 +1,19 @@
+import ArticleModel from '../models/article';
 import { Context } from 'koa';
 import { Types } from 'mongoose';
 import slug from 'slug';
 import CategoryModel from '../models/category';
 import TCategory from '../models/category/type';
-
+type TListSortable = {
+  _id: string;
+  index: number;
+};
 const treeCategories = async (parentId: string | null) => {
-  const result = await CategoryModel.find({ parentId: parentId === 'parent' ? null : new Types.ObjectId(parentId as string) })
+  const result = await CategoryModel.find({ parentId: parentId === 'parent' ? null : parentId })
     .sort({ index: -1 })
     .lean();
-  console.log(result);
   const data = await Promise.all(result.map(async (res: TCategory) => {
-    const childrens = await treeCategories(res.parentId);
+    const childrens = await treeCategories(res._id);
     return {
       ...res,
       childrens,
@@ -23,21 +26,22 @@ export const getCategoryByQuery = async (ctx: Context) => {
   try {
     const { page, limit, s, parentId } = ctx.query;
     const search: string = s as string || '';
+    const pId = parentId as string;
     const l = parseInt(limit as string, 10) || 15;
     const p = parseInt(page as string, 10) > 0 ? parseInt(page as string, 10) - 1 : 0;
     // Neu parentId === null thì lấy tất cả ParentId = null (Category cha)
     // Nguoc lai thì lấy category theo parentId
     let result: TCategory[];
-    if (!parentId) {
-      result = await CategoryModel.find({ title: { $regex: `.*${search}.*` } })
+    if (parentId === 'all') {
+      result = await CategoryModel.find({ title: { $regex: `.*${search}.*`, $options: 'i' } })
         .sort({ index: -1 })
         .skip(p * l)
         .limit(l)
         .lean();
     } else {
       result = await CategoryModel.find({
-        title: { $regex: `.*${search}.*` },
-        parentId: parentId === 'parent' ? null : new Types.ObjectId(parentId as string),
+        title: { $regex: `.*${search}.*`, $options: 'i' },
+        parentId: !pId ? null : pId,
       })
         .sort({ index: -1 })
         .skip(p * l)
@@ -55,7 +59,6 @@ export const getCategoryByQuery = async (ctx: Context) => {
 export const getListCategoryParent = async (ctx: Context) => {
   try {
     const result = await treeCategories('parent');
-    console.log(result);
     ctx.body = result;
   } catch (error) {
     console.log(error);
@@ -66,16 +69,79 @@ export const getListCategoryParent = async (ctx: Context) => {
 export const postCategory = async (ctx: Context) => {
   try {
     const { title, description, parentId, type } = ctx.request.body as TCategory;
+    const index = await CategoryModel.count();
     const result = await CategoryModel.create({
       title,
       description,
-      parentId: new Types.ObjectId(parentId) || null,
+      parentId: !parentId ? null :  new Types.ObjectId(parentId),
       type,
+      index: index + 1,
       slug: slug(title),
     });
     ctx.body = result;
   } catch (error) {
     console.log(error);
+    ctx.status = 400;
+    ctx.body = error;
+  }
+};
+
+export const putCategory = async (ctx: Context) => {
+  try {
+    const { id } = ctx.params;
+    const { title, description, parentId } = ctx.request.body as TCategory;
+    const result = await CategoryModel.updateOne({ _id: id }, {
+      title,
+      description,
+      parentId: !parentId ? null :  parentId,
+      slug: slug(title),
+    });
+    ctx.body = result;
+  } catch (error) {
+    console.log(error);
+    ctx.status = 400;
+    ctx.body = error;
+  }
+};
+
+export const deleteCategory = async (ctx: Context) => {
+  try {
+    const { id } = ctx.params;
+    const category = await CategoryModel.findOne({ _id: id });
+    await category.remove();
+    await ArticleModel.updateMany({ _id: { $in: category.articles } }, { $pull: { categories: id } });
+    ctx.body = true;
+  } catch (error) {
+    console.log(error);
+    ctx.status = 400;
+    ctx.body = error;
+  }
+};
+
+export const deleteCategories = async (ctx: Context) => {
+  try {
+    const listId = ctx.request.body as any;
+    for (const id of listId) {
+      await CategoryModel.deleteOne({ _id: id });
+    }
+    ctx.body = 'ok';
+  } catch (error) {
+    console.log(error);
+    ctx.status = 400;
+    ctx.body = error;
+  }
+};
+
+export const swapCategory = async (ctx: Context) => {
+  try {
+    const list = ctx.request.body as TListSortable[];
+    console.log(list);
+    for (const items of list) {
+      await CategoryModel.updateOne({ _id: items[0]._id }, { index: items[1].index });
+      await CategoryModel.updateOne({ _id: items[1]._id }, { index: items[0].index });
+    }
+    ctx.body = true;
+  } catch (error) {
     ctx.status = 400;
     ctx.body = error;
   }
