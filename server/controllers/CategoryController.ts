@@ -50,20 +50,18 @@ export const getCategoryByQuery = async (ctx: Context) => {
     }
 
     ctx.body = result;
-  } catch (error) {
-    console.log(error);
-    ctx.status = 400;
-    ctx.body = error;
+  } catch (err) {
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = { message: err.message };
   }
 };
 export const getListCategoryParent = async (ctx: Context) => {
   try {
     const result = await treeCategories('parent');
     ctx.body = result;
-  } catch (error) {
-    console.log(error);
-    ctx.status = 400;
-    ctx.body = error;
+  } catch (err) {
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = { message: err.message };
   }
 };
 export const postCategory = async (ctx: Context) => {
@@ -79,10 +77,9 @@ export const postCategory = async (ctx: Context) => {
       slug: slug(title),
     });
     ctx.body = result;
-  } catch (error) {
-    console.log(error);
-    ctx.status = 400;
-    ctx.body = error;
+  } catch (err) {
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = { message: err.message };
   }
 };
 
@@ -97,10 +94,9 @@ export const putCategory = async (ctx: Context) => {
       slug: slug(title),
     });
     ctx.body = result;
-  } catch (error) {
-    console.log(error);
-    ctx.status = 400;
-    ctx.body = error;
+  } catch (err) {
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = { message: err.message };
   }
 };
 
@@ -111,10 +107,9 @@ export const deleteCategory = async (ctx: Context) => {
     await category.remove();
     await ArticleModel.updateMany({ _id: { $in: category.articles } }, { $pull: { categories: id } });
     ctx.body = true;
-  } catch (error) {
-    console.log(error);
-    ctx.status = 400;
-    ctx.body = error;
+  } catch (err) {
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = { message: err.message };
   }
 };
 
@@ -125,10 +120,9 @@ export const deleteCategories = async (ctx: Context) => {
       await CategoryModel.deleteOne({ _id: id });
     }
     ctx.body = 'ok';
-  } catch (error) {
-    console.log(error);
-    ctx.status = 400;
-    ctx.body = error;
+  } catch (err) {
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = { message: err.message };
   }
 };
 
@@ -141,8 +135,8 @@ export const swapCategory = async (ctx: Context) => {
       await CategoryModel.updateOne({ _id: items[1]._id }, { index: items[0].index });
     }
     ctx.body = true;
-  } catch (error) {
-    ctx.status = 400;
-    ctx.body = error;
+  } catch (err) {
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = { message: err.message };
   }
 };

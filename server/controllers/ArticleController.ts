@@ -13,10 +13,9 @@ export const getArticleByQuery = async (ctx: Context) => {
     const result = await Article.find({ title: { $regex: `.*${search}.*`, $options: 'i' } }).sort({ index: -1 }).skip(p * l).limit(l)
       .lean();
     ctx.body = result;
-  } catch (error) {
-    console.log(error);
-    ctx.status = 400;
-    ctx.body = error;
+  } catch (err) {
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = { message: err.message };
   }
 };
 
@@ -25,10 +24,9 @@ export const getArticle = async (ctx: Context) => {
     const { id } = ctx.params;
     const result = await Article.findById(id).lean();
     ctx.body = result;
-  } catch (error) {
-    console.log(error);
-    ctx.status = 400;
-    ctx.body = error;
+  } catch (err) {
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = { message: err.message };
   }
 };
 
@@ -44,10 +42,9 @@ export const postArticle = async (ctx: Context) => {
     });
     await CategoryModel.updateMany({ _id: { $in: categories } }, { $push: { articles: result._id } });
     ctx.body = result;
-  } catch (error) {
-    console.log(error);
-    ctx.status = 400;
-    ctx.body = error;
+  } catch (err) {
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = { message: err.message };
   }
 };
 
@@ -64,10 +61,9 @@ export const putArticle = async (ctx: Context) => {
     });
     await CategoryModel.updateMany({ _id: { $in: categories } }, { $addToSet: { articles: id } });
     ctx.body = result;
-  } catch (error) {
-    console.log(error);
-    ctx.status = 400;
-    ctx.body = error;
+  } catch (err) {
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = { message: err.message };
   }
 };
 
@@ -78,10 +74,9 @@ export const deleteArticle = async (ctx: Context) => {
     await article.remove();
     await CategoryModel.updateMany({ _id: { $in: article.categories } }, { $pull: { articles: article._id } });
     ctx.body = true;
-  } catch (error) {
-    console.log(error);
-    ctx.status = 400;
-    ctx.body = error;
+  } catch (err) {
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = { message: err.message };
   }
 };
 
@@ -93,10 +88,9 @@ export const deleteArticles = async (ctx: Context) => {
       await Article.deleteOne({ _id: id });
     }));
     ctx.body = 'ok';
-  } catch (error) {
-    console.log(error);
-    ctx.status = 400;
-    ctx.body = error;
+  } catch (err) {
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = { message: err.message };
   }
 };
 
@@ -108,8 +102,8 @@ export const swapArticle = async (ctx: Context) => {
     await Article.updateOne({ _id: articleTwo._id }, { index: articleOne.index });
 
     ctx.body = true;
-  } catch (error) {
-    ctx.status = 400;
-    ctx.body = error;
+  } catch (err) {
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = { message: err.message };
   }
 };

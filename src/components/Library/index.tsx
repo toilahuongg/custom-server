@@ -1,13 +1,14 @@
 import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import { Col, ProgressBar, Row } from 'react-bootstrap';
+import { observer } from 'mobx-react';
 import { useDropzone } from 'react-dropzone';
 import { nanoid } from 'nanoid';
+import LazyLoad from 'react-lazyload';
 import LibraryContext from './model';
-import { observer } from 'mobx-react';
-import { applySnapshot, getSnapshot } from 'mobx-state-tree';
 import instance from '@src/helper/instance';
-import { Col, ProgressBar, Row } from 'react-bootstrap';
 import styles from './library.module.scss';
 import { fileSize, getImage } from '@src/helper/common';
+import { Clipboard, InfoLg, Trash } from 'react-bootstrap-icons';
 
 const baseStyle = {
   flex: 1,
@@ -53,7 +54,6 @@ const LibraryLayout: React.FC = () => {
       };
     });
     for (const f of files) {
-      console.log(getSnapshot(images));
       let data = new FormData();
       const infoImage = await getImage(f.file);
       const { width, height, size } = infoImage;
@@ -96,7 +96,7 @@ const LibraryLayout: React.FC = () => {
 
   useEffect(() => {
     const run = async () => {
-      await getImages({ page: 1, limit: 12 });
+      await getImages({ page: 1, limit: 100 });
     };
     run();
   }, []);
@@ -113,10 +113,19 @@ const LibraryLayout: React.FC = () => {
       {images.map(img => img?._id && (
     <Col key={img._id} sm="6" md="3" lg="2">
       <div className={styles.item}>
-        <img src={img.url} alt="" />
-        <div className={styles.bg} style={{ visibility: (img.status === 'uploading' ? 'visible' : 'hidden' ) }}>
+        <LazyLoad height={250}>
+          <img src={img.url} alt="" />
+        </LazyLoad>
+        <div className={styles.coatingUploading} style={{ visibility: (img.status === 'uploading' ? 'visible' : 'hidden' ) }}>
           <div className={styles.size}> {img.size} </div>
           <ProgressBar animated now={img.progress} label={`${img.progress}%`}/>
+        </div>
+        <div className={styles.coatingEffect} style={{ visibility: (img.status === 'uploading' ? 'hidden' : 'visible' ) }}>
+          <div className={styles.actions}>
+            <button className={styles.btnInfo}> <InfoLg /> </button>
+            <button className={styles.btnCopy}> <Clipboard /> </button>
+            <button className={styles.btnRemove}> <Trash /> </button>
+          </div>
         </div>
       </div>
     </Col>

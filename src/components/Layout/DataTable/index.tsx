@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useRef } from 'react';
 import { Spinner, Table } from 'react-bootstrap';
-import { v4 as uuidv4 } from 'uuid';
+import { nanoid } from 'nanoid';
 import Sortable from 'sortablejs';
 import styles from './datatable.module.scss';
 
@@ -37,7 +37,7 @@ const DataTable: React.FC<TProps> = ({
       <Table hover responsive>
         <thead>
           <tr>
-            {headings.map((elm) => <th key={uuidv4()} style={{ width: elm.size }}> {elm.label} </th>)}
+            {headings.map((elm) => <th key={nanoid()} style={{ width: elm.size }}> {elm.label} </th>)}
           </tr>
         </thead>
         <tbody ref={element}>
@@ -55,9 +55,9 @@ const DataTable: React.FC<TProps> = ({
               </tr>
             )
               : rows.map((row) => (
-                <tr key={uuidv4()}>
+                <tr key={nanoid()}>
                   {
-                  row.map((elm: any) => <td key={uuidv4()}> { elm } </td>)
+                  row.map((elm: any) => <td key={nanoid()}> { elm } </td>)
                 }
                 </tr>
               ))

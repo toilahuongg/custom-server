@@ -1,22 +1,31 @@
 .item {
   position: relative;
+  margin-bottom: 24px;
+  background-color: #ddd;
   img {
     width: 100%;
     height: 128px;
     object-fit: cover;
   }
+  &:hover .coatingEffect {
+    opacity: 1;
+  }
 }
-.bg {
+.coating {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba($color: #fff, $alpha: 0.3);
   display: flex;
-  flex-flow: column;
   justify-content: center;
   align-items: center;
+  transition: .3s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+.coatingUploading {
+  @extend .coating;
+  background-color: rgba($color: #fff, $alpha: 0.7);
+  flex-flow: column;
   padding: 20px;
   & > * {
     width: 100%;
@@ -25,5 +34,45 @@
     margin-bottom: 10px;
     text-align: center;
     font-weight: 500;
+  }
+}
+.coatingEffect {
+  @extend .coating;
+  opacity: 0;
+  background-color: rgba($color: #000, $alpha: 0.5);
+}
+.actions {
+  border-radius: 3px;
+  overflow: hidden;
+}
+.btn {
+  border: none;
+  outline: none;
+  padding: 5px 10px;
+  color: #fff;
+  transition: .3s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+.btnInfo {
+  @extend .btn;
+  background-color: #a647ff;
+  &:hover {
+    background-color: #fff;
+    color: #a647ff;
+  }
+}
+.btnCopy {
+  @extend .btn;
+  background-color: #05d417;
+  &:hover {
+    background-color: #fff;
+    color: #05d417;
+  }
+}
+.btnRemove {
+  @extend .btn;
+  background-color: #fb4848;
+  &:hover {
+    background-color: #fff;
+    color: #fb4848;
   }
 }
