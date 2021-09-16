@@ -3,7 +3,7 @@ import { applySnapshot } from 'mobx-state-tree';
 import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import useStore from '../../stores';
-import CustomButton from '../Button';
+import CustomButton from '../Layout/Button';
 import FormCategory from './FormCategory';
 
 type TProps = {

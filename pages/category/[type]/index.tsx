@@ -16,15 +16,15 @@ import {
   Back, GripVertical, PencilSquare, PlusSquare, Trash, 
 } from 'react-bootstrap-icons';
 import { useRouter } from 'next/dist/client/router';
-import DataTable from '@src/components/DataTable';
-import AdminLayout from '@src/components';
-import Card from '@src/components/Card';
+import DataTable from '@src/components/Layout/DataTable';
+import AdminLayout from '@src/components/AdminLayout';
+import Card from '@src/components/Layout/Card';
 import useStore from '@src/stores';
-import CustomButton from '@src/components/Button';
+import CustomButton from '@src/components/Layout/Button';
 import { applySnapshot } from 'mobx-state-tree';
 import database from '@server/utils/database';
 import CategoryModel from '@server/models/category';
-import CustomPagination from '@src/components/Pagination';
+import CustomPagination from '@src/components/Layout/Pagination';
 import moment from 'moment';
 import ModalCategory from '@src/components/Category/ModalCategory';
 import { toastErrorMessage } from '@src/helper/common';

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react';
 import { useRouter } from 'next/router';
 import instance from '../../helper/instance';
-import Loading from '../Loading';
+import Loading from '../Layout/Loading';
 
 type TProps = {
   children?:

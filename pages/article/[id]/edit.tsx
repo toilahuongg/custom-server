@@ -8,15 +8,15 @@ import { ArrowReturnLeft } from 'react-bootstrap-icons';
 import { observer } from 'mobx-react';
 import { toast } from 'react-toastify';
 
-import AdminLayout from '@src/components';
+import AdminLayout from '@src/components/AdminLayout';
 import FormArticle from '@src/components/Article/FormArticle';
 import useStore from '@src/stores';
 import { IArticleModelOut } from '@src/stores/article';
-import CustomButton from '@src/components/Button';
+import CustomButton from '@src/components/Layout/Button';
 import Article from '@server/models/article';
 import database from '@server/utils/database';
 import { makeid } from '@src/helper/common';
-import SidebarContext from '@src/components/Sidebar/models';
+import SidebarContext from '@src/components/Layout/Sidebar/models';
 
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
@@ -36,9 +36,10 @@ type TProps = {
 const EditArticlePage: React.FC<TProps> = ({ item }) => {
   const router = useRouter();
   const [keyEditor, setKeyEditor] = useState('');
-  const { article } = useStore();
+  const { article, category } = useStore();
   const { setIsShowSidebar } = useContext(SidebarContext);
   const { loading, detailArticle, setLoading, actionArticle } = article;
+  const { selectCategories } = category;
 
   const back = () => router.push('/article');
   const handleClick = async (e: React.MouseEvent) => {
@@ -57,6 +58,7 @@ const EditArticlePage: React.FC<TProps> = ({ item }) => {
 
   useEffect(() => {
     applySnapshot(detailArticle, item);
+    applySnapshot(selectCategories, item.categories);
     setIsShowSidebar(false);
     setKeyEditor(makeid(10));
     return () => {

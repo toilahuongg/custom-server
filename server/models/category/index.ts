@@ -13,7 +13,7 @@ const CategorySchema = new Schema<TCategory>({
     index: true,
     unique: true,
   },
-  articles: [{ type: mongoose.Types.ObjectId, ref: 'categories' }],
+  articles: [{ type: mongoose.Types.ObjectId, ref: 'articles' }],
   index: { type: Number, unique: false },
   type: { type: String },
 }, { timestamps: true });

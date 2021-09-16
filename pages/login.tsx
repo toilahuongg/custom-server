@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react';
 import React, { FormEvent } from 'react';
 import { Card, Form } from 'react-bootstrap';
-import CustomButton from '@src/components/Button';
-import CustomHead from '@src/components/CustomHead';
+import CustomButton from '@src/components/Layout/Button';
+import CustomHead from '@src/components/Layout/CustomHead';
 import { useUser } from '@src/hooks/user';
 
 const LoginPage: React.FC = () => {

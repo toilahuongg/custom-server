@@ -1,7 +1,7 @@
-import { Context } from 'koa';
+import { Context, Next } from 'koa';
 import jwt from 'jsonwebtoken';
 
-export const verifyToken = async (ctx: Context, next) => {
+export const verifyToken = async (ctx: Context, next: Next) => {
   try {
     const authHeader = ctx.headers.authorization;
     if (!authHeader) throw Error('Unauthorized');

@@ -5,10 +5,10 @@ import { ArrowReturnLeft } from 'react-bootstrap-icons';
 import { useRouter } from 'next/router';
 import { observer } from 'mobx-react';
 import { toast } from 'react-toastify';
-import AdminLayout from '@src/components';
+import AdminLayout from '@src/components/AdminLayout';
 import FormArticle from '@src/components/Article/FormArticle';
 import useStore from '@src/stores';
-import CustomButton from '@src/components/Button';
+import CustomButton from '@src/components/Layout/Button';
 
 const CreateArticlePage: React.FC = () => {
   const router = useRouter();

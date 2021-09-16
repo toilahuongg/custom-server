@@ -20,12 +20,12 @@ import database from '@server/utils/database';
 import ArticleModel from '@server/models/article';
 
 import useStore from '@src/stores';
-import DataTable from '@src/components/DataTable';
-import AdminLayout from '@src/components';
-import Card from '@src/components/Card';
+import DataTable from '@src/components/Layout/DataTable';
+import AdminLayout from '@src/components/AdminLayout';
+import Card from '@src/components/Layout/Card';
 import ModalDeleteArticle from '@src/components/Article/ModalDeleteArticle';
-import CustomButton from '@src/components/Button';
-import CustomPagination from '@src/components/Pagination';
+import CustomButton from '@src/components/Layout/Button';
+import CustomPagination from '@src/components/Layout/Pagination';
 import { toastErrorMessage } from '@src/helper/common';
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {

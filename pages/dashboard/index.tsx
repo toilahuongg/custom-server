@@ -2,7 +2,7 @@ import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { Cart, CurrencyDollar, Envelope, People } from 'react-bootstrap-icons';
 import Box from '@src/components/Dashboard/Box';
-import AdminLayout from '@src/components';
+import AdminLayout from '@src/components/AdminLayout';
 
 const DashboardPage: React.FC = () => {
   return (

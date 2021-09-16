@@ -14,3 +14,19 @@ export const makeid = (length: number) => {
   }
   return result;
 };
+export const fileSize = (size: number) => {
+  if (size === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(size) / Math.log(k));
+  return (size / Math.pow(k, i)).toFixed(2) + ` ${sizes[i]}`;
+};
+export const getImage = (file: File): Promise<{ width: string, height: string, size: string }> => new Promise(resolve => {
+  const img = new Image();
+  const objectUrl = URL.createObjectURL(file);
+  img.onload = function () {
+    resolve({ width: '' + img.width, height: '' + img.height, size: fileSize(file.size) });
+    URL.revokeObjectURL(objectUrl);
+  };
+  img.src = objectUrl;
+});

@@ -5,6 +5,7 @@ import {
 } from '../controllers/ArticleController';
 import { register, login } from '../controllers/UserController';
 import { getCategoryByQuery, getListCategoryParent } from '../controllers/CategoryController';
+import { getImages } from '../controllers/LibraryController';
 
 const router = new Router();
 
@@ -25,5 +26,10 @@ const categoryRouter = new Router();
 categoryRouter.get('/', getCategoryByQuery);
 categoryRouter.get('/tree', getListCategoryParent);
 router.use('/category', categoryRouter.routes());
+
+// Library
+const libraryRouter = new Router();
+libraryRouter.get('/', getImages);
+router.use('/library', libraryRouter.routes());
 
 export default router;

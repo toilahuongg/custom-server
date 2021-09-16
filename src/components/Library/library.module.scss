@@ -1,0 +1,29 @@
+.item {
+  position: relative;
+  img {
+    width: 100%;
+    height: 128px;
+    object-fit: cover;
+  }
+}
+.bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba($color: #fff, $alpha: 0.3);
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  & > * {
+    width: 100%;
+  }
+  .size {
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: 500;
+  }
+}

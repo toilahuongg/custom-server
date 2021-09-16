@@ -12,7 +12,7 @@ export const login = async (ctx: Context) => {
     if (!result) throw Error('Unauthorized');
     const match = bcrypt.compareSync(password, result.password);
     if (!match) throw Error('Unauthorized');
-    const token = jwt.sign({ data: { username } }, process.env.JWT_SECRET, { expiresIn: 60 * 60 });
+    const token = jwt.sign({ data: { username } }, process.env.JWT_SECRET, { expiresIn: 24 * 60 * 60 });
     ctx.body = token;
   } catch (error) {
     console.log(error);

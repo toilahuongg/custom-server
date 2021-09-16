@@ -15,7 +15,9 @@ import {
   putCategory,
   swapCategory, 
 } from '../controllers/CategoryController';
-
+import { uploadSingle } from '../controllers/LibraryController';
+import multer from '@koa/multer';
+const upload = multer();
 const router = new Router();
 router.use(verifyToken);
 
@@ -41,5 +43,10 @@ categoryRouter.delete('/:id', deleteCategory);
 categoryRouter.delete('/', deleteCategories);
 categoryRouter.post('/swap', swapCategory);
 router.use('/category', categoryRouter.routes());
+
+// Library
+const libraryRouter = new Router();
+libraryRouter.post('/', upload.single('file'), uploadSingle);
+router.use('/library', libraryRouter.routes());
 
 export default router;

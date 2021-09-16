@@ -8,8 +8,8 @@ const StoreModel = types.model({
   category: types.optional(CategoryModels, {}),
 });
 
-export const StoreContext = createContext<IStoreModel>(StoreModel.create());
+export const StoreContext = createContext<IStoreModels>(StoreModel.create());
 const useStore = () => useContext(StoreContext);
 
-export interface IStoreModel extends Instance<typeof StoreModel> { }
+export interface IStoreModels extends Instance<typeof StoreModel> {}
 export default useStore;

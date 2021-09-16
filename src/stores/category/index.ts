@@ -10,6 +10,7 @@ const CategoryModel = types.model({
   type: types.optional(types.string, ''),
   index: types.optional(types.number, 0),
   parentId: types.maybeNull(types.optional(types.string, '')),
+  categories: types.array(types.optional(types.string, '')),
   createdAt: types.optional(types.string, ''),
   updatedAt: types.optional(types.string, ''),
 })

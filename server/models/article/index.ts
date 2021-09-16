@@ -8,7 +8,7 @@ const ArticleSchema = new Schema<TArticle>({
   },
   description: { type: String },
   content: { type: String },
-  categories: [{ type: mongoose.Types.ObjectId, ref: 'articles' }],
+  categories: [{ type: mongoose.Types.ObjectId, ref: 'categories' }],
   index: { type: Date, default: Date.now },
   slug: {
     type: String,
