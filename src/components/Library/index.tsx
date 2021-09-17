@@ -13,6 +13,10 @@ import instance from '@src/helper/instance';
 import styles from './library.module.scss';
 import { fileSize, getImage } from '@src/helper/common';
 import { Clipboard as ClipboardIcon, InfoLg, Trash } from 'react-bootstrap-icons';
+import ModalImageInfo from './ModalImageInfo';
+import { applySnapshot, getSnapshot } from 'mobx-state-tree';
+import { toast } from 'react-toastify';
+import ModalImageRemove from './ModalImageRemove';
 
 const baseStyle = {
   flex: 1,
@@ -38,9 +42,9 @@ const rejectStyle = { borderColor: '#ff1744' };
 
 const LibraryLayout: React.FC = () => {
   const {
-    images, pagination, countImage, loading,
-    setLoading, addToWait, updateProgress, 
-    setShowModalInfo, updateFromWaitToImage, getImages, 
+    image, images, pagination, countImage, loading,
+    setLoading, addToWait, updateProgress, getImageById,
+    setShowModalInfo, setShowModalRemove, updateFromWaitToImage, getImages, 
   } = useContext(LibraryContext);
   const loadMore = useRef(null);
   const onDrop = useCallback(async (acceptedFiles) => {
@@ -125,8 +129,27 @@ const LibraryLayout: React.FC = () => {
       threshold: 0,
     });
     obs.observe(loadMore.current);
+    return () => {
+      applySnapshot(image, {});
+      setShowModalInfo(false);
+      setShowModalRemove(false);
+    };
   }, [countImage]);
 
+  const fnShowInfo = (id: string) => () => {
+    const img = getImageById(id);
+    applySnapshot(image, getSnapshot(img));
+    setShowModalInfo(true);
+  };
+  const fnCopyUrl = (url: string) => () => {
+    navigator.clipboard.writeText(url);
+    toast.success('Đã copy', { delay: 300 });
+  };
+  const fnRemove = (id: string) => () => {
+    const img = getImageById(id);
+    applySnapshot(image, getSnapshot(img));
+    setShowModalRemove(true);
+  };
   return (
   <>
     <div {...getRootProps({ style })}>
@@ -152,19 +175,19 @@ const LibraryLayout: React.FC = () => {
                   placement="top"
                   overlay={<Tooltip id="info">Chi tiết</Tooltip>}
                 >
-                  <button className={styles.btnInfo} onClick={() => setShowModalInfo(true)}> <InfoLg /> </button>
+                  <button className={styles.btnInfo} onClick={fnShowInfo(img._id)}> <InfoLg /> </button>
                 </OverlayTrigger>
                 <OverlayTrigger
                   placement="top"
                   overlay={<Tooltip id="copy">Copy</Tooltip>}
                 >
-                  <button className={styles.btnCopy}> <ClipboardIcon /> </button>
+                  <button className={styles.btnCopy} onClick={fnCopyUrl(img.url)}> <ClipboardIcon /> </button>
                 </OverlayTrigger>
                 <OverlayTrigger
                   placement="top"
                   overlay={<Tooltip id="delete">Delete</Tooltip>}
                 >
-                  <button className={styles.btnRemove}> <Trash /> </button>
+                  <button className={styles.btnRemove} onClick={fnRemove(img._id)}> <Trash /> </button>
                 </OverlayTrigger>
               </div>
             </div>
@@ -175,6 +198,8 @@ const LibraryLayout: React.FC = () => {
     <div className={styles.loading} ref={loadMore}>
       {loading && <Spinner animation="border" /> }
     </div>
+    <ModalImageInfo />
+    <ModalImageRemove />
   </>
   );
 };

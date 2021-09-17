@@ -133,7 +133,7 @@ const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
         clearTimeout(swappingTimeoutRef.current);
       }
       swappingTimeoutRef.current = setTimeout(() => {
-        toast.success('Swap success');
+        toast.success('Swap success', { autoClose: 500 });
       }, 500);
     } catch (error) {
       toast.error(toastErrorMessage(error.message));

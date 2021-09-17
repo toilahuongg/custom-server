@@ -3,7 +3,7 @@ import { createContext } from 'react';
 import instance from '../../helper/instance';
 
 const LibaryModel = types.model({
-  _id: types.optional(types.identifier, ''),
+  _id: types.optional(types.string, ''),
   url: types.optional(types.string, ''),
   size: types.optional(types.string, ''),
   type: types.optional(types.string, ''),
@@ -13,7 +13,12 @@ const LibaryModel = types.model({
   categories: types.array(types.optional(types.string, '')),
   status: types.optional(types.string, ''),
   progress: types.optional(types.number, 0),
-});
+}).volatile<{ loading: boolean }>(() => ({ loading: false }))
+  .actions((self) => ({
+    setLoading(value: boolean) {
+      self.loading = value;
+    },
+  }));
 const PaginationModel = types.model({
   page: types.optional(types.number, 0),
   limit: types.optional(types.number, 18),
@@ -27,14 +32,18 @@ const PaginationModel = types.model({
 }));
 
 const LibaryModels = types.model({ 
+  image: types.optional(LibaryModel, {}),
   images: types.array(LibaryModel),
   pagination: types.optional(PaginationModel, {}),
   countImage: types.optional(types.number, 0),
 })
-  .volatile<{ loading: boolean, isShowModalInfo: boolean }>(() => ({ loading: true, isShowModalInfo: false }))
+  .volatile<{ loading: boolean, isShowModalInfo: boolean, isShowModalRemove: boolean }>(() => ({ loading: true, isShowModalInfo: false, isShowModalRemove: false }))
   .actions((self) => ({
     setLoading(value: boolean) {
       self.loading = value;
+    },
+    setShowModalRemove(value: boolean) {
+      self.isShowModalRemove = value;
     },
     setShowModalInfo(value: boolean) {
       self.isShowModalInfo = value;
@@ -67,7 +76,17 @@ const LibaryModels = types.model({
         throw error;
       }
     }),
-  }));
+    removeImage: flow(function * (id: string) {
+      try {
+        yield instance.delete(`/library/${id}`);
+        self.images = cast(self.images.filter(({ _id }) => _id !== id));
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    }),
+  }))
+  .views((self) => ({ getImageById: (id: string) => self.images.find(({ _id }) => _id === id) }));
 const StoreLibrary = LibaryModels.create();
 export const LibraryContext = createContext(StoreLibrary);
 export default LibraryContext;
