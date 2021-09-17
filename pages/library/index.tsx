@@ -4,7 +4,7 @@ import LibraryLayout from '@src/components/Library';
 const LibraryPage: React.FC = () => {
 
   return (
-    <AdminLayout title="Dashboard">
+    <AdminLayout title="Library">
       <LibraryLayout />
     </AdminLayout>
   );

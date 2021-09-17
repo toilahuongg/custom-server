@@ -1,5 +1,9 @@
-import React, { useCallback, useContext, useEffect, useMemo } from 'react';
-import { Col, ProgressBar, Row } from 'react-bootstrap';
+import React, {
+  useCallback, useContext, useEffect, useMemo, useRef, 
+} from 'react';
+import {
+  Col, OverlayTrigger, ProgressBar, Row, Spinner, Tooltip, 
+} from 'react-bootstrap';
 import { observer } from 'mobx-react';
 import { useDropzone } from 'react-dropzone';
 import { nanoid } from 'nanoid';
@@ -8,7 +12,7 @@ import LibraryContext from './model';
 import instance from '@src/helper/instance';
 import styles from './library.module.scss';
 import { fileSize, getImage } from '@src/helper/common';
-import { Clipboard, InfoLg, Trash } from 'react-bootstrap-icons';
+import { Clipboard as ClipboardIcon, InfoLg, Trash } from 'react-bootstrap-icons';
 
 const baseStyle = {
   flex: 1,
@@ -34,8 +38,9 @@ const rejectStyle = { borderColor: '#ff1744' };
 
 const LibraryLayout: React.FC = () => {
   const {
-    images, addToWait, updateProgress, updateFromWaitToImage, getImages, 
+    images, pagination, countImage, loading, setLoading, addToWait, updateProgress, updateFromWaitToImage, getImages, 
   } = useContext(LibraryContext);
+  const loadMore = useRef(null);
   const onDrop = useCallback(async (acceptedFiles) => {
     const files = acceptedFiles.map((file: File) => {
       const img = new Image();
@@ -96,10 +101,32 @@ const LibraryLayout: React.FC = () => {
 
   useEffect(() => {
     const run = async () => {
-      await getImages({ page: 1, limit: 100 });
+      try {
+        setLoading(true);
+        await getImages();
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
     };
-    run();
-  }, []);
+    
+    const obs = new IntersectionObserver(async (entry) => {
+      if (entry[0].isIntersecting) {
+        const page = pagination.page + 1;
+        pagination.setPage(page);
+        await run();
+        if (images.length >= countImage) {
+          obs.unobserve(entry[0].target);
+        }
+      }
+    }, {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0,
+    });
+    obs.observe(loadMore.current);
+  }, [countImage]);
 
   return (
   <>
@@ -111,26 +138,44 @@ const LibraryLayout: React.FC = () => {
     <br />
     <Row>
       {images.map(img => img?._id && (
-    <Col key={img._id} sm="6" md="3" lg="2">
-      <div className={styles.item}>
-        <LazyLoad height={250}>
-          <img src={img.url} alt="" />
-        </LazyLoad>
-        <div className={styles.coatingUploading} style={{ visibility: (img.status === 'uploading' ? 'visible' : 'hidden' ) }}>
-          <div className={styles.size}> {img.size} </div>
-          <ProgressBar animated now={img.progress} label={`${img.progress}%`}/>
-        </div>
-        <div className={styles.coatingEffect} style={{ visibility: (img.status === 'uploading' ? 'hidden' : 'visible' ) }}>
-          <div className={styles.actions}>
-            <button className={styles.btnInfo}> <InfoLg /> </button>
-            <button className={styles.btnCopy}> <Clipboard /> </button>
-            <button className={styles.btnRemove}> <Trash /> </button>
+        <Col key={img._id} sm="6" md="3" lg="2">
+          <div className={styles.item}>
+            <LazyLoad height={128}>
+              <img src={img.url} alt="" />
+            </LazyLoad>
+            <div className={styles.coatingUploading} style={{ visibility: (img.status === 'uploading' ? 'visible' : 'hidden' ) }}>
+              <div className={styles.size}> {img.size} </div>
+              <ProgressBar animated now={img.progress} label={`${img.progress}%`}/>
+            </div>
+            <div className={styles.coatingEffect} style={{ visibility: (img.status === 'uploading' ? 'hidden' : 'visible' ) }}>
+              <div className={styles.actions}>
+                <OverlayTrigger
+                  placement="top"
+                  overlay={<Tooltip id="info">Chi tiết</Tooltip>}
+                >
+                  <button className={styles.btnInfo}> <InfoLg /> </button>
+                </OverlayTrigger>
+                <OverlayTrigger
+                  placement="top"
+                  overlay={<Tooltip id="copy">Copy</Tooltip>}
+                >
+                  <button className={styles.btnCopy}> <ClipboardIcon /> </button>
+                </OverlayTrigger>
+                <OverlayTrigger
+                  placement="top"
+                  overlay={<Tooltip id="delete">Delete</Tooltip>}
+                >
+                  <button className={styles.btnRemove}> <Trash /> </button>
+                </OverlayTrigger>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </Col>
+        </Col>
       ))}
     </Row>
+    <div className={styles.loading} ref={loadMore}>
+      {loading && <Spinner animation="border" /> }
+    </div>
   </>
   );
 };

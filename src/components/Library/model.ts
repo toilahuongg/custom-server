@@ -1,4 +1,4 @@
-import { types, flow } from 'mobx-state-tree';
+import { types, flow, cast } from 'mobx-state-tree';
 import { createContext } from 'react';
 import instance from '../../helper/instance';
 
@@ -14,33 +14,55 @@ const LibaryModel = types.model({
   status: types.optional(types.string, ''),
   progress: types.optional(types.number, 0),
 });
-
-const LibaryModels = types.model({ images: types.array(LibaryModel) }).actions((self) => ({
-  addToWait(data) {
-    self.images.unshift(data);
+const PaginationModel = types.model({
+  page: types.optional(types.number, 0),
+  limit: types.optional(types.number, 18),
+}).actions((self) => ({
+  setPage(value: number) {
+    self.page = value;
   },
-  updateProgress(id: string, progress: number) {
-    const idx = self.images.findIndex((item) => item._id === id);
-    if (idx >= 0) {
-      self.images[idx].progress = progress;
-    }
+  setLimit(value: number) {
+    self.limit = value;
   },
-  updateFromWaitToImage(id: string, data) {
-    const idx = self.images.findIndex((item) => item._id === id);
-    if (idx >= 0) {
-      self.images[idx] = data;
-    }
-  },
-  getImages: flow(function * ({ page, limit }) {
-    try {
-      const response = yield instance.get('/library', { params: { page, limit } });
-      self.images = response.data;
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  }),
 }));
+
+const LibaryModels = types.model({ 
+  images: types.array(LibaryModel),
+  pagination: types.optional(PaginationModel, {}),
+  countImage: types.optional(types.number, 0),
+})
+  .volatile<{ loading: boolean }>(() => ({ loading: true }))
+  .actions((self) => ({
+    setLoading(value: boolean) {
+      self.loading = value;
+    },
+    addToWait(data) {
+      self.images.unshift(data);
+    },
+    updateProgress(id: string, progress: number) {
+      const idx = self.images.findIndex((item) => item._id === id);
+      if (idx >= 0) {
+        self.images[idx].progress = progress;
+      }
+    },
+    updateFromWaitToImage(id: string, data) {
+      const idx = self.images.findIndex((item) => item._id === id);
+      if (idx >= 0) {
+        self.images[idx] = data;
+      }
+    },
+    getImages: flow(function * () {
+      try {
+        const response = yield instance.get('/library', { params: { page: self.pagination.page, limit: self.pagination.limit } });
+        const [data, count] = response.data;
+        self.countImage = count;
+        self.images = cast([...self.images, ...data]);
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    }),
+  }));
 const StoreLibrary = LibaryModels.create();
 export const LibraryContext = createContext(StoreLibrary);
 export default LibraryContext;
