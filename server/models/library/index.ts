@@ -18,6 +18,6 @@ const LibrarySchema = new Schema<TLibrary>({
   },
   articles: [{ type: mongoose.Types.ObjectId, ref: 'articles' }],
   categories: [{ type: mongoose.Types.ObjectId, ref: 'categories' }],
-});
+}, { timestamps: true });
 const LibraryModel = mongoose.models.library || mongoose.model('library', LibrarySchema);
 export default LibraryModel;

@@ -3,7 +3,7 @@ import { createContext } from 'react';
 import instance from '../../helper/instance';
 
 const LibaryModel = types.model({
-  _id: types.optional(types.string, ''),
+  _id: types.optional(types.identifier, ''),
   url: types.optional(types.string, ''),
   size: types.optional(types.string, ''),
   type: types.optional(types.string, ''),
@@ -31,10 +31,13 @@ const LibaryModels = types.model({
   pagination: types.optional(PaginationModel, {}),
   countImage: types.optional(types.number, 0),
 })
-  .volatile<{ loading: boolean }>(() => ({ loading: true }))
+  .volatile<{ loading: boolean, isShowModalInfo: boolean }>(() => ({ loading: true, isShowModalInfo: false }))
   .actions((self) => ({
     setLoading(value: boolean) {
       self.loading = value;
+    },
+    setShowModalInfo(value: boolean) {
+      self.isShowModalInfo = value;
     },
     addToWait(data) {
       self.images.unshift(data);
@@ -56,7 +59,9 @@ const LibaryModels = types.model({
         const response = yield instance.get('/library', { params: { page: self.pagination.page, limit: self.pagination.limit } });
         const [data, count] = response.data;
         self.countImage = count;
-        self.images = cast([...self.images, ...data]);
+        if (self.images.length < count) {
+          self.images = cast([...self.images, ...data]);
+        }
       } catch (error) {
         console.log(error);
         throw error;

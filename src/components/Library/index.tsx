@@ -38,7 +38,9 @@ const rejectStyle = { borderColor: '#ff1744' };
 
 const LibraryLayout: React.FC = () => {
   const {
-    images, pagination, countImage, loading, setLoading, addToWait, updateProgress, updateFromWaitToImage, getImages, 
+    images, pagination, countImage, loading,
+    setLoading, addToWait, updateProgress, 
+    setShowModalInfo, updateFromWaitToImage, getImages, 
   } = useContext(LibraryContext);
   const loadMore = useRef(null);
   const onDrop = useCallback(async (acceptedFiles) => {
@@ -72,10 +74,7 @@ const LibraryLayout: React.FC = () => {
           updateProgress(f._id, process);
         }, 
       }).then((res) => {
-        updateFromWaitToImage(f._id, {
-          ...res.data,
-          status: 'finish',
-        });
+        updateFromWaitToImage(f._id, { ...res.data[0], status: 'finish' });
       });
     }
   }, []);
@@ -153,7 +152,7 @@ const LibraryLayout: React.FC = () => {
                   placement="top"
                   overlay={<Tooltip id="info">Chi tiết</Tooltip>}
                 >
-                  <button className={styles.btnInfo}> <InfoLg /> </button>
+                  <button className={styles.btnInfo} onClick={() => setShowModalInfo(true)}> <InfoLg /> </button>
                 </OverlayTrigger>
                 <OverlayTrigger
                   placement="top"

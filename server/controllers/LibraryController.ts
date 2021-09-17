@@ -35,7 +35,7 @@ export const getImages = async (ctx: Context) => {
     const { page, limit } = ctx.query;
     const l = parseInt(limit as string, 10) || 15;
     const p = parseInt(page as string, 10) > 0 ? parseInt(page as string, 10) - 1 : 0;
-    const result = await LibraryModel.find().sort({ createdAt: 1 }).skip(p * l).limit(l)
+    const result = await LibraryModel.find().sort({ createdAt: -1 }).skip(p * l).limit(l)
       .lean();
     ctx.body = await getCountLibrary(result);
   } catch (err) {
