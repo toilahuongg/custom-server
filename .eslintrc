@@ -55,6 +55,8 @@
     "react/destructuring-assignment": "off",
     "no-return-assign": "off",
     "@typescript-eslint/no-shadow": "off",
-    "@typescript-eslint/naming-convention": "off"
+    "@typescript-eslint/naming-convention": "off",
+    "linebreak-style": "off",
+    "no-alert": "off"
   }
 }

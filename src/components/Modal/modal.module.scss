@@ -1,0 +1,44 @@
+.modal {
+  position: fixed;
+  width: calc(100vh + 100vw);
+  height: calc(100vh + 100vw);
+  top: -50vw;
+  left: -50vh;
+  z-index: 999;
+  background-color: #77005f;
+  border-radius: 50%;
+  transition: .3s cubic-bezier(0.075, 0.82, 0.165, 1);
+  transform: scale(0);
+  &.active {
+    transform: scale(1);
+  }
+  .tooltip {
+    position: fixed;
+    z-index: 9999;
+    top: 35%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-family: 'Bangers', cursive;
+    font-size: 18px;
+  }
+  .body {
+    position: fixed;
+    z-index: 9999;
+    top: 45%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    text-align: center;
+    max-width: 300px;
+    .title {
+      color: yellow;
+      font-family: 'Bangers', cursive;
+      font-size: 40px;
+      margin-bottom: 20px;
+    }
+    .content {
+      font-size: 18px;
+    }
+  }
+}

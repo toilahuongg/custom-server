@@ -1,31 +1,33 @@
 import Router from 'koa-router';
 import {
-  getArticle,
-  getArticleByQuery,
-  postArticle,
-  putArticle,
-  deleteArticle,
-  deleteArticles,
-  swapArticle,
-} from '../controllers/ArticleController';
-import { postCategory } from '../controllers/CategoryController';
+  getGiftBox,
+  getGiftBoxs,
+  openGiftBox,
+  postGiftBox,
+} from '../controllers/GiftBoxController';
+
+import {
+  getUser,
+  getUsers,
+  postUser,
+  checkUser,
+} from '../controllers/UserController';
 
 const router = new Router();
 
 router.prefix('/api');
 
 const articleRouter = new Router();
-articleRouter.get('/', getArticleByQuery);
-articleRouter.post('/', postArticle);
-articleRouter.get('/:id', getArticle);
-articleRouter.put('/:id', putArticle);
-articleRouter.delete('/:id', deleteArticle);
-articleRouter.delete('/', deleteArticles);
-articleRouter.post('/swap', swapArticle);
-router.use('/article', articleRouter.routes());
+articleRouter.get('/', getGiftBoxs);
+articleRouter.post('/', postGiftBox);
+articleRouter.get('/:id', getGiftBox);
+articleRouter.post('/open', openGiftBox);
+router.use('/gift-box', articleRouter.routes());
 
-const categoryRouter = new Router();
-categoryRouter.post('/', postCategory);
-router.use('/category', categoryRouter.routes());
-
+const userRouter = new Router();
+userRouter.get('/', getUsers);
+userRouter.post('/', postUser);
+userRouter.post('/check', checkUser);
+userRouter.get('/:id', getUser);
+router.use('/user', userRouter.routes());
 export default router;

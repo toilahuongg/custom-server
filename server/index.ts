@@ -5,6 +5,8 @@ import serve from 'koa-static';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import bodyParser from 'koa-bodyparser';
+import { Server, Socket } from 'socket.io';
+import http from 'http';
 import publicRouter from './routers/publicRouter';
 
 dotenv.config();
@@ -28,20 +30,31 @@ const run = async () => {
     });
 
     console.log('>> Mongodb Connected');
-    const server = new Koa();
+    const sv = new Koa();
+    const server = http.createServer(sv.callback());
+    const io = new Server(server);
+    io.on('connection', (socket: Socket) => {
+      socket.on('open-gift', (data) => {
+        console.log(socket.id, '=id');
+        io.emit('open-gift', data);
+      });
+      socket.on('error', (data) => {
+        console.log(socket.id, '=id');
+        io.emit('error', data);
+      });
+    });
+    sv.context.io = io;
     const router = new Router();
-
     router.use(bodyParser());
-    server.use(serve(`${__dirname}/static`));
+    sv.use(serve(`${__dirname}/static`));
     router.use(publicRouter.routes());
-
     router.all('(.*)', async (ctx: Context) => {
       await handle(ctx.req, ctx.res);
       ctx.respond = false;
     });
 
-    server.use(router.allowedMethods());
-    server.use(router.routes());
+    sv.use(router.allowedMethods());
+    sv.use(router.routes());
 
     server.listen(PORT, () => {
       console.log(`>> server is running on port ${PORT}`);
