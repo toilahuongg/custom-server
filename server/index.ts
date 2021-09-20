@@ -35,12 +35,10 @@ const run = async () => {
     const io = new Server(server);
     io.on('connection', (socket: Socket) => {
       socket.on('open-gift', (data) => {
-        console.log(socket.id, '=id');
-        io.emit('open-gift', data);
+        io.emit('open-gift', { id: socket.id, data });
       });
       socket.on('error', (data) => {
-        console.log(socket.id, '=id');
-        io.emit('error', data);
+        io.emit('error', { id: socket.id, data });
       });
     });
     sv.context.io = io;

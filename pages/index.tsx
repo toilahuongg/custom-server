@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import io from 'socket.io-client';
 import Modal from '../src/components/Modal';
+import Sidebar from '../src/components/Sidebar';
 import instance from '../src/helper/instance';
 import useStore from '../src/stores';
 import GiftBox from '../styles/giftbox.svg';
@@ -40,13 +41,15 @@ const HomePage: React.FC = () => {
       }
     };
     run();
-    socket.on('open-gift', ({ id, userId }) => {
-      openGiftBox({ id, userId });
-      setActive(true);
-      applySnapshot(detailGiftBox, getSnapshot(getGiftBoxById(id)));
+    socket.on('open-gift', ({ id, data }) => {
+      if (socket.id !== id) {
+        openGiftBox({ id: data.id, userId: data.userId });
+        setActive(true);
+        applySnapshot(detailGiftBox, getSnapshot(getGiftBoxById(data.id)));
+      }
     });
-    socket.on('error', (msg) => {
-      toast(msg, { position: 'top-center' });
+    socket.on('error', ({ id, data }) => {
+      if (socket.id !== id) { toast(data, { position: 'top-center' }); }
     });
   }, []);
   const fnChooseGiftbox = (id: string) => async () => {
@@ -60,10 +63,9 @@ const HomePage: React.FC = () => {
       setActive(true);
       socket.emit('open-gift', { id, userId });
     } catch (error) {
-      if (error.message) {
-        socket.emit('error', error.message);
-        toast(`${auth.fullname}: ${error.message}`, { position: 'top-center' });
-      }
+      const msg = error.response?.data || error.message || 'Đã xảy ra lỗi';
+      socket.emit('error', `${auth.fullname}: ${msg}`);
+      toast(`${auth.fullname}: ${msg}`, { position: 'top-center' });
     }
   };
   const toggleActive = () => setActive(!active);
@@ -72,15 +74,17 @@ const HomePage: React.FC = () => {
       { listGiftBox.map((item) => (
         <div key={item._id}>
           {item.status ? (
-            <OpenGiftBox style={{ width: '144px', height: '144px', cursor: 'pointer' }} onClick={fnChooseGiftbox(item._id)} />
+            <OpenGiftBox style={{ width: '288px', height: '288px', cursor: 'pointer' }} onClick={fnChooseGiftbox(item._id)} />
           ) : (
             <GiftBox
-              style={{ width: '144px', height: '144px', cursor: 'pointer' }}
+              className="giftbox"
+              style={{ width: '288px', height: '288px', cursor: 'pointer' }}
               onClick={fnChooseGiftbox(item._id)}
             />
           )}
         </div>
       ))}
+      <Sidebar />
       <Modal active={active} toggleActive={toggleActive} />
     </div>
   );

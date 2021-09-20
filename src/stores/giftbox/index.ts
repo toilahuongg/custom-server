@@ -6,7 +6,12 @@ export const GiftBoxModel = types.model({
   status: types.optional(types.boolean, false),
   user: types.optional(types.string, ''),
 })
-  .volatile<{ loading: boolean }>(() => ({ loading: false }));
+  .volatile<{ loading: boolean }>(() => ({ loading: false }))
+  .actions((self) => ({
+    setId(id: string) {
+      self._id = id;
+    },
+  }));
 
 export const GiftBoxModels = types.model({
   detailGiftBox: types.optional(GiftBoxModel, {}),

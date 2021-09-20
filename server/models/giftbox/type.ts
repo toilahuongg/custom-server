@@ -1,7 +1,7 @@
 type TGiftBox = {
   _id: string,
-  desc: string,
-  image: string,
+  content: string,
+  price: string,
   status: boolean,
   users: string,
   createdAt: string,

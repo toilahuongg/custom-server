@@ -4,6 +4,7 @@ body {
 	height: 100%;
 	min-height: 100vh;
 	font-family: 'Roboto', sans-serif;
+	background-color: #ff9595;
 }
 #__next {
 	height: 100%;
@@ -14,28 +15,32 @@ a {
 		color: #df4444;
 	}
 }
-/* width */
-::-webkit-scrollbar {
-  width: 10px;
-}
 
-/* Track */
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-	border-radius: 10px;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #0A1931;
-	border-radius: 10px;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #232323;
-	border-radius: 10px;
-}
 small {
 	font-size: 12px;
+}
+.giftbox {
+	&:hover {
+		animation: giftbox 1s infinite;
+	}
+}
+@keyframes giftbox {
+	0% {
+		transform: rotate(0deg);
+	}
+	20% {
+		transform: rotate(15deg);
+	}
+	40% {
+		transform: rotate(0deg);
+	}
+	60% {
+		transform: rotate(-15deg);
+	}
+	80% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(0deg);
+	}
 }

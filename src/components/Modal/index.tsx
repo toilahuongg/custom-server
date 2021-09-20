@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { applySnapshot, getSnapshot } from 'mobx-state-tree';
+import { getSnapshot } from 'mobx-state-tree';
 import React, { useEffect, useRef, useState } from 'react';
 import instance from '../../helper/instance';
 import useStore from '../../stores';
@@ -16,8 +16,8 @@ const listAudio = [
 ];
 type TGiftBox = {
   _id?: string,
-  desc?: string,
-  image?: string,
+  content?: string,
+  price?: string,
   status?: boolean,
   users?: string,
   createdAt?: string,
@@ -53,10 +53,6 @@ const Modal: React.FC<TProps> = ({ active, toggleActive }) => {
     } else {
       audio.current.pause();
     }
-
-    return () => {
-      applySnapshot(detailGiftBox, {});
-    };
   }, [active]);
   return (
     <div onClick={toggleActive} className={`${styles.modal} ${active ? styles.active : ''}`}>
@@ -66,7 +62,7 @@ const Modal: React.FC<TProps> = ({ active, toggleActive }) => {
           <>
             <div className={styles.title}> Xin chúc mừng {detailGiftBox.user && getSnapshot(getUserById(detailGiftBox.user)).fullname}</div>
             <div className={styles.content}>
-              Bạn đã nhận được một phần quà là <b> {data.desc} </b> trị giá 500k
+              Bạn đã nhận được một phần quà là <b> {data.content} </b> trị giá <b>{data.price}</b>
             </div>
           </>
         )}

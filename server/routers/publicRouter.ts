@@ -17,12 +17,12 @@ const router = new Router();
 
 router.prefix('/api');
 
-const articleRouter = new Router();
-articleRouter.get('/', getGiftBoxs);
-articleRouter.post('/', postGiftBox);
-articleRouter.get('/:id', getGiftBox);
-articleRouter.post('/open', openGiftBox);
-router.use('/gift-box', articleRouter.routes());
+const giftboxRouter = new Router();
+giftboxRouter.get('/', getGiftBoxs);
+giftboxRouter.post('/', postGiftBox);
+giftboxRouter.get('/:id', getGiftBox);
+giftboxRouter.post('/open', openGiftBox);
+router.use('/gift-box', giftboxRouter.routes());
 
 const userRouter = new Router();
 userRouter.get('/', getUsers);

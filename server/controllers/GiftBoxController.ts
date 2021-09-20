@@ -31,8 +31,8 @@ export const getGiftBox = async (ctx: Context) => {
 export const postGiftBox = async (ctx: Context) => {
   try {
     if (ctx.request.header.toilahuong !== 'tt') throw new Error('Ban khong co quyen');
-    const { desc, image, status } = ctx.request.body;
-    const result = await GiftBoxModel.create({ desc, image, status });
+    const { content, price, status } = ctx.request.body;
+    const result = await GiftBoxModel.create({ content, price, status });
     ctx.body = result;
   } catch (error) {
     console.log(error);
@@ -55,8 +55,7 @@ export const openGiftBox = async (ctx: Context) => {
     const result = await GiftBoxModel.updateOne({ _id: id }, { status: true, user: userId });
     ctx.body = result;
   } catch (error) {
-    console.log(error);
     ctx.status = 400;
-    ctx.body = error;
+    ctx.body = error.message;
   }
 };
