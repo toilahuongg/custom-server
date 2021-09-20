@@ -10,9 +10,9 @@ type TProps = {
   toggleActive: () => void
 };
 const listAudio = [
-  'http://localhost:3000/VOTAY.mp3',
-  'http://localhost:3000/VICTORY.mp3',
-  'http://localhost:3000/YAY.mp3',
+  '/VOTAY.mp3',
+  '/VICTORY.mp3',
+  '/YAY.mp3',
 ];
 type TGiftBox = {
   _id?: string,
@@ -67,6 +67,7 @@ const Modal: React.FC<TProps> = ({ active, toggleActive }) => {
           </>
         )}
       </div>
+      { active && <iframe title=" " src="silence.mp3" allow="autoplay" id="audio" />}
     </div>
   );
 };
