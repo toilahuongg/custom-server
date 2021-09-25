@@ -11,6 +11,7 @@ const App: React.FC<AppProps> = ({ Component, pageProps }) => {
     <>
       <Head>
         <title> Chúc mừng sinh nhật ĐCĐ - PTIT </title>
+        <link rel="shortcut icon" href="/images/logo.png" type="image/x-icon" />
       </Head>
       <ToastContainer
         position="top-right"
