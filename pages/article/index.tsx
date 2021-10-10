@@ -17,7 +17,6 @@ import { applySnapshot } from 'mobx-state-tree';
 import { toast } from 'react-toastify';
 
 import database from '@server/utils/database';
-import ArticleModel from '@server/models/article';
 
 import useStore from '@src/stores';
 import DataTable from '@src/components/Layout/DataTable';
@@ -29,8 +28,8 @@ import CustomPagination from '@src/components/Layout/Pagination';
 import { toastErrorMessage } from '@src/helper/common';
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-  await database();
-  const countPage = await ArticleModel.count();
+  const db = await database();
+  const countPage = await db.models.Article.count();
   const { query } = context;
   const { page, limit, s, category } = query;
   return {
@@ -228,7 +227,6 @@ const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
     const run = async () => {
       try {
         const options = await getTreeCategories();
-        console.log(options);
         setTreeCategory(options);
       } catch (error) {
         console.log(error);

@@ -23,6 +23,7 @@ export const getArticle = async (ctx: Context) => {
   try {
     const { id } = ctx.params;
     const result = await Article.findById(id).lean();
+    console.log(result);
     ctx.body = result;
   } catch (err) {
     ctx.status = err.statusCode || err.status || 500;
@@ -32,9 +33,12 @@ export const getArticle = async (ctx: Context) => {
 
 export const postArticle = async (ctx: Context) => {
   try {
-    const { title, description, content, categories } = ctx.request.body as TArticle;
+    const {
+      title, featuredImage, description, content, categories, 
+    } = ctx.request.body as TArticle;
     const result = await Article.create({
       title: title || '',
+      featuredImage: featuredImage || null,
       description: description || '',
       content: content || '',
       categories: categories,
@@ -51,9 +55,12 @@ export const postArticle = async (ctx: Context) => {
 export const putArticle = async (ctx: Context) => {
   try {
     const { id } = ctx.params;
-    const { title, description, content, categories } = ctx.request.body as TArticle;
+    const {
+      title, featuredImage, description, content, categories, 
+    } = ctx.request.body as TArticle;
     const result = await Article.updateOne({ _id: id }, {
       title: title || '',
+      featuredImage: featuredImage || null,
       description: description || '',
       content: content || '',
       slug: slug(title),

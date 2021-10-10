@@ -1,12 +1,13 @@
+import { useEffect } from 'react';
 import { observer } from 'mobx-react';
 import { applySnapshot } from 'mobx-state-tree';
-import { useContext, useEffect } from 'react';
 import { Button, Col, Modal, Row } from 'react-bootstrap';
-import LibraryContext from './model';
+import useStore from '../../stores';
 import styles from './library.module.scss';
 
 const ModalImageInfo: React.FC = () => {
-  const { image, isShowModalInfo, setShowModalInfo } = useContext(LibraryContext);
+  const { library } = useStore();
+  const { image, isShowModalInfo, setShowModalInfo } = library;
   const {
     url, type, size, height, width, 
   } = image;

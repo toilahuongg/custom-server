@@ -13,9 +13,9 @@ const CategorySchema = new Schema<TCategory>({
     index: true,
     unique: true,
   },
-  articles: [{ type: mongoose.Types.ObjectId, ref: 'articles' }],
+  articles: [{ type: mongoose.Types.ObjectId, ref: 'Article' }],
   index: { type: Number, unique: false },
   type: { type: String },
 }, { timestamps: true });
-const CategoryModel = mongoose.models.category || mongoose.model('category', CategorySchema);
+const CategoryModel = mongoose.model('Category', CategorySchema);
 export default CategoryModel;

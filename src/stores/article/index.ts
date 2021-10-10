@@ -1,16 +1,17 @@
 import {
-  applySnapshot, cast, flow, getParent, getSnapshot, Instance, SnapshotOut, types,
+  applySnapshot, cast, flow, getSnapshot, Instance, SnapshotOut, types,
 } from 'mobx-state-tree';
-import { IStoreModel } from '..';
 import instance from '../../helper/instance';
 
 export const ArticleModel = types.model({
   _id: types.optional(types.string, ''),
   title: types.optional(types.string, ''),
+  featuredImage: types.optional(types.string, ''),
   description: types.optional(types.string, ''),
   content: types.optional(types.string, ''),
   index: types.optional(types.string, ''),
   slug: types.optional(types.string, ''),
+  categories: types.array(types.optional(types.string, '')),
   createdAt: types.optional(types.string, ''),
   updatedAt: types.optional(types.string, ''),
 })
@@ -20,8 +21,19 @@ export const ArticleModel = types.model({
       self.loading = value;
     },
     setTitle: (value: string) => { self.title = value; },
+    setFeaturedImage: (value: string) => { self.featuredImage = value; },
     setDescription: (value: string) => { self.description = value; },
     setContent: (value: string) => { self.content = value; },
+    selectCategory(id: string) {
+      const idx = self.categories.indexOf(id);
+      if (idx >= 0) self.categories.splice(idx, 1);
+      else self.categories.push(id);
+    },
+  }))
+  .views((self) => ({
+    checkCategory(id: string) {
+      return self.categories.includes(id);
+    },
   }));
 
 export const ArticleModels = types.model({
@@ -37,6 +49,7 @@ export const ArticleModels = types.model({
     getArticles: flow(function* (params) {
       try {
         const response = yield instance.get('/article', { params });
+        console.log(response.data);
         self.listArticle = response.data;
       } catch (error) {
         console.log(error);
@@ -45,12 +58,7 @@ export const ArticleModels = types.model({
     }),
     actionArticle: flow(function* (type?: string) {
       try {
-        const { category } = getParent(self, 1) as IStoreModel;
-        const { selectCategories } = category;
-        const data = {
-          ...getSnapshot(self.detailArticle),
-          categories: [...selectCategories],
-        };
+        const data = { ...getSnapshot(self.detailArticle) };
         if (type === 'edit') {
           yield instance.put(`/article/${data._id}`, data);
           const idx = self.listArticle.findIndex((item) => item._id === data._id);

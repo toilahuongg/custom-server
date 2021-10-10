@@ -1,12 +1,13 @@
+import {  useEffect } from 'react';
 import { observer } from 'mobx-react';
 import { applySnapshot } from 'mobx-state-tree';
-import { useContext, useEffect } from 'react';
 import { Button, Modal } from 'react-bootstrap';
+import useStore from '@src/stores';
 import CustomButton from '../Layout/Button';
-import LibraryContext from './model';
 
 const ModalImageRemove: React.FC = () => {
-  const { image, isShowModalRemove, setShowModalRemove, removeImage } = useContext(LibraryContext);
+  const { library } = useStore();
+  const { image, isShowModalRemove, setShowModalRemove, removeImage } = library;
 
   useEffect(() => {
     return () => applySnapshot(image, {});

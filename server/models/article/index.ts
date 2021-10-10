@@ -6,9 +6,10 @@ const ArticleSchema = new Schema<TArticle>({
     type: String,
     required: true,
   },
+  featuredImage: { type: mongoose.Types.ObjectId, ref: 'Library' },
   description: { type: String },
   content: { type: String },
-  categories: [{ type: mongoose.Types.ObjectId, ref: 'categories' }],
+  categories: [{ type: mongoose.Types.ObjectId, ref: 'Category' }],
   index: { type: Date, default: Date.now },
   slug: {
     type: String,
@@ -17,5 +18,5 @@ const ArticleSchema = new Schema<TArticle>({
   },
 }, { timestamps: true });
 
-const ArticleModel = mongoose.models.article || mongoose.model<TArticle>('article', ArticleSchema);
+const ArticleModel = mongoose.model<TArticle>('Article', ArticleSchema);
 export default ArticleModel;

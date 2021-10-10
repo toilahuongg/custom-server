@@ -1,14 +1,10 @@
-import React, {
-  useCallback, useContext, useEffect, useMemo, useRef, 
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import {
-  Col, OverlayTrigger, ProgressBar, Row, Spinner, Tooltip, 
+  Col, Form, OverlayTrigger, ProgressBar, Row, Spinner, Tooltip, 
 } from 'react-bootstrap';
 import { observer } from 'mobx-react';
 import { useDropzone } from 'react-dropzone';
 import { nanoid } from 'nanoid';
-import LazyLoad from 'react-lazyload';
-import LibraryContext from './model';
 import instance from '@src/helper/instance';
 import styles from './library.module.scss';
 import { fileSize, getImage } from '@src/helper/common';
@@ -17,6 +13,7 @@ import ModalImageInfo from './ModalImageInfo';
 import { applySnapshot, getSnapshot } from 'mobx-state-tree';
 import { toast } from 'react-toastify';
 import ModalImageRemove from './ModalImageRemove';
+import useStore from '@src/stores';
 
 const baseStyle = {
   flex: 1,
@@ -40,18 +37,22 @@ const acceptStyle = { borderColor: '#00e676' };
 
 const rejectStyle = { borderColor: '#ff1744' };
 
-const LibraryLayout: React.FC = () => {
+type TProps = {
+  isPicker?: boolean;
+  imagesSelected?: string[];
+  onChange?: (id: string) => void;
+};
+const LibraryLayout: React.FC<TProps> = ({ isPicker, imagesSelected = [], onChange = () => {} }) => {
+  const { library } = useStore();
   const {
     image, images, pagination, countImage, loading,
     setLoading, addToWait, updateProgress, getImageById,
-    setShowModalInfo, setShowModalRemove, updateFromWaitToImage, getImages, 
-  } = useContext(LibraryContext);
+    setShowModalInfo, setShowModalRemove, updateFromWaitToImage, getImages,
+  } = library;
   const loadMore = useRef(null);
   const onDrop = useCallback(async (acceptedFiles) => {
     const files = acceptedFiles.map((file: File) => {
-      const img = new Image();
       const objectUrl = URL.createObjectURL(file);
-      img.src = objectUrl;
       const wait = {
         _id: nanoid(),
         status: 'uploading',
@@ -150,6 +151,7 @@ const LibraryLayout: React.FC = () => {
     applySnapshot(image, getSnapshot(img));
     setShowModalRemove(true);
   };
+
   return (
   <>
     <div {...getRootProps({ style })}>
@@ -162,35 +164,47 @@ const LibraryLayout: React.FC = () => {
       {images.map(img => img?._id && (
         <Col key={img._id} sm="6" md="3" lg="2">
           <div className={styles.item}>
-            <LazyLoad height={128}>
-              <img src={img.url} alt="" />
-            </LazyLoad>
+            <img src={img.url} alt="" />
             <div className={styles.coatingUploading} style={{ visibility: (img.status === 'uploading' ? 'visible' : 'hidden' ) }}>
               <div className={styles.size}> {img.size} </div>
               <ProgressBar animated now={img.progress} label={`${img.progress}%`}/>
             </div>
+            {
+              isPicker && 
+                (
+                <Form.Check 
+                  type='checkbox'
+                  className={styles.picker}
+                  checked={imagesSelected.includes(img._id)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    e.stopPropagation();
+                    onChange(img._id);
+                  }}
+                />
+                )
+            }
             <div className={styles.coatingEffect} style={{ visibility: (img.status === 'uploading' ? 'hidden' : 'visible' ) }}>
-              <div className={styles.actions}>
-                <OverlayTrigger
-                  placement="top"
-                  overlay={<Tooltip id="info">Chi tiết</Tooltip>}
-                >
-                  <button className={styles.btnInfo} onClick={fnShowInfo(img._id)}> <InfoLg /> </button>
-                </OverlayTrigger>
-                <OverlayTrigger
-                  placement="top"
-                  overlay={<Tooltip id="copy">Copy</Tooltip>}
-                >
-                  <button className={styles.btnCopy} onClick={fnCopyUrl(img.url)}> <ClipboardIcon /> </button>
-                </OverlayTrigger>
-                <OverlayTrigger
-                  placement="top"
-                  overlay={<Tooltip id="delete">Delete</Tooltip>}
-                >
-                  <button className={styles.btnRemove} onClick={fnRemove(img._id)}> <Trash /> </button>
-                </OverlayTrigger>
-              </div>
-            </div>
+                  <div className={styles.actions}>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<Tooltip id="info">Chi tiết</Tooltip>}
+                    >
+                      <button className={styles.btnInfo} onClick={fnShowInfo(img._id)}> <InfoLg /> </button>
+                    </OverlayTrigger>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<Tooltip id="copy">Copy</Tooltip>}
+                    >
+                      <button className={styles.btnCopy} onClick={fnCopyUrl(img.url)}> <ClipboardIcon /> </button>
+                    </OverlayTrigger>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<Tooltip id="delete">Delete</Tooltip>}
+                    >
+                      <button className={styles.btnRemove} onClick={fnRemove(img._id)}> <Trash /> </button>
+                    </OverlayTrigger>
+                  </div>
+                </div>
           </div>
         </Col>
       ))}

@@ -21,9 +21,8 @@ import AdminLayout from '@src/components/AdminLayout';
 import Card from '@src/components/Layout/Card';
 import useStore from '@src/stores';
 import CustomButton from '@src/components/Layout/Button';
-import { applySnapshot } from 'mobx-state-tree';
+import { applySnapshot, getSnapshot } from 'mobx-state-tree';
 import database from '@server/utils/database';
-import CategoryModel from '@server/models/category';
 import CustomPagination from '@src/components/Layout/Pagination';
 import moment from 'moment';
 import ModalCategory from '@src/components/Category/ModalCategory';
@@ -32,12 +31,12 @@ import { toast } from 'react-toastify';
 import ModalDeleteCategory from '@src/components/Category/ModalDeleteCategory';
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-  await database();
+  const db = await database();
   const { query, params } = context;
   const { page, limit, s, parentId } = query;
   const { type } = params;
   const pId = parentId as string || null;
-  const countPage = await CategoryModel.find({ parendId: pId }).count();
+  const countPage = await db.models.Category.find({ parendId: pId }).count();
   if (!(type === 'article')) {
     return { notFound: true };
   }
@@ -182,7 +181,7 @@ const CategoryPage: React.FC<TProps> = ({
     setShowModal(true);
     if (tp === 'edit') {
       const item = listCategory.find(({ _id }) => _id === id);
-      applySnapshot(detailCategory, item);
+      applySnapshot(detailCategory, getSnapshot(item));
     }
   };
   const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {

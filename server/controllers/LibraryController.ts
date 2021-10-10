@@ -2,6 +2,7 @@ import { Context } from 'koa';
 import * as fs from 'fs/promises';
 import path from 'path';
 import LibraryModel from '../models/library';
+import ArticleModel from '../models/article';
 const getCountLibrary = async (data) => {
   const count = await LibraryModel.count();
   return [
@@ -62,6 +63,8 @@ export const removeImage = async (ctx: Context) => {
     const spl = image.url.split('/');
     const filePath = path.resolve(__dirname, `../public/images/${spl[spl.length - 1]}`);
     await fs.unlink(filePath);
+    await ArticleModel.updateMany({ featureImage: id }, { $unset: { featureImage: 1 } });
+    await image.deleteOne();
     ctx.body = await getCountLibrary(true);
   } catch (err) {
     ctx.status = err.statusCode || err.status || 500;

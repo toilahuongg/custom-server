@@ -51,3 +51,41 @@ small {
 	vertical-align: center;
 	object-fit: cover;
 }
+.choose-image {
+	position: relative;
+	.none {
+		display: flex;
+		height: 100%;
+		border:  5px dashed #ddd;
+		justify-content: center;
+		align-items: center;
+		color: #ddd;
+		font-weight: 500;
+		cursor: pointer;
+	}
+	.has {
+		@extend .none;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: rgba($color: #000000, $alpha: 0.5);
+		color: #fff;
+		opacity: 0;
+		border: none;
+		z-index: 100;
+	}
+	&:hover .has {
+		opacity: 1;
+	}
+	img {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		z-index: 99;
+	}
+}

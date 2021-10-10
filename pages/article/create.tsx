@@ -1,23 +1,20 @@
 import React, { useEffect } from 'react';
 import { applySnapshot } from 'mobx-state-tree';
-import { Button } from 'react-bootstrap';
-import { ArrowReturnLeft } from 'react-bootstrap-icons';
 import { useRouter } from 'next/router';
 import { observer } from 'mobx-react';
 import { toast } from 'react-toastify';
-import AdminLayout from '@src/components/AdminLayout';
-import FormArticle from '@src/components/Article/FormArticle';
+import ArticleLayout from '@src/components/Article/ArticleLayout';
 import useStore from '@src/stores';
-import CustomButton from '@src/components/Layout/Button';
 
 const CreateArticlePage: React.FC = () => {
   const router = useRouter();
   const { article } = useStore();
-  const { loading, detailArticle, setLoading, actionArticle } = article;
+  const { detailArticle, setLoading, actionArticle } = article;
   const back = () => router.push('/article');
-  const handleClick = async (e: React.MouseEvent) => {
+  const handleClick = (e: React.MouseEvent) => async (isPublish: boolean) => {
     try {
       e.preventDefault();
+      console.log(isPublish);
       setLoading(true);
       await actionArticle();
       toast.success('Success');
@@ -31,18 +28,6 @@ const CreateArticlePage: React.FC = () => {
   useEffect(() => {
     return () => applySnapshot(detailArticle, {});
   }, []);
-  return (
-    <AdminLayout title="New Article">
-      <div className="d-flex justify-content-between mb-3">
-        <Button variant="outline-dark" onClick={back}> <ArrowReturnLeft /> </Button>
-        <div>
-          <CustomButton onClick={handleClick} loading={loading}>
-            Save
-          </CustomButton>
-        </div>
-      </div>
-      <FormArticle />
-    </AdminLayout>
-  );
+  return <ArticleLayout title="New Article" txtSave="Publish" onSave={handleClick} />;
 };
 export default observer(CreateArticlePage);

@@ -10,7 +10,7 @@ const CategoryModel = types.model({
   type: types.optional(types.string, ''),
   index: types.optional(types.number, 0),
   parentId: types.maybeNull(types.optional(types.string, '')),
-  categories: types.array(types.optional(types.string, '')),
+  articles: types.array(types.optional(types.string, '')),
   createdAt: types.optional(types.string, ''),
   updatedAt: types.optional(types.string, ''),
 })
@@ -38,6 +38,9 @@ export const CategoryModels = types.model({
     },
     setShowModal: (value: boolean) => {
       self.showModal = value;
+    },
+    setDetailCategory: (item) => {
+      self.detailCategory = item;
     },
     getCategories: flow(function* ({ page, limit, s, parentId }) {
       try {
@@ -175,7 +178,6 @@ export const CategoryModels = types.model({
                 if (childrens.length > 0) addOptionToArray(childrens, `${prefix}--`);
               } 
             }
-            
           });
         };
         addOptionToArray(response.data);

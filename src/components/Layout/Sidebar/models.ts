@@ -2,7 +2,7 @@ import { types } from 'mobx-state-tree';
 import { createContext } from 'react';
 
 const SidebarModel = types.model({ isShowSidebar: types.optional(types.boolean, true) }).actions((self) => ({
-  setIsShowSidebar(value: boolean) {
+  setShowSidebar(value: boolean) {
     self.isShowSidebar = value;
   },
   toggleIsShowSidebar() {
