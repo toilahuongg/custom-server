@@ -2,81 +2,50 @@ import { observer } from 'mobx-react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import React, 
 { 
-  ChangeEvent,
-  FormEvent,
-  useEffect,
   useRef,
   useState,
 } from 'react';
-import Link from 'next/link';
-import {
-  Button, ButtonGroup, Col, Form, Row,
-} from 'react-bootstrap';
+import { Button, ButtonGroup, Form } from 'react-bootstrap';
 import {
   Back, GripVertical, PencilSquare, PlusSquare, Trash, 
 } from 'react-bootstrap-icons';
-import { useRouter } from 'next/dist/client/router';
 import DataTable from '@src/components/Layout/DataTable';
 import AdminLayout from '@src/components/AdminLayout';
 import Card from '@src/components/Layout/Card';
 import useStore from '@src/stores';
 import CustomButton from '@src/components/Layout/Button';
 import { applySnapshot, getSnapshot } from 'mobx-state-tree';
-import database from '@server/utils/database';
-import CustomPagination from '@src/components/Layout/Pagination';
 import moment from 'moment';
 import ModalCategory from '@src/components/Category/ModalCategory';
-import { toastErrorMessage } from '@src/helper/common';
+import { makeid, toastErrorMessage } from '@src/helper/common';
 import { toast } from 'react-toastify';
 import ModalDeleteCategory from '@src/components/Category/ModalDeleteCategory';
+import { useTreeCategories } from '@src/hooks';
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-  const db = await database();
-  const { query, params } = context;
-  const { page, limit, s, parentId } = query;
+  const { params } = context;
   const { type } = params;
-  const pId = parentId as string || null;
-  const countPage = await db.models.Category.find({ parendId: pId }).count();
   if (!(type === 'article')) {
     return { notFound: true };
   }
-  return {
-    props: {
-      type: type as string, 
-      page: page as string || '1',
-      limit: limit as string || '15',
-      s: s as string || '',
-      parentId: pId,
-      countPage, 
-    },
-  };
+  return { props: { type: type as string } };
 };
 
 
 type TProps = {
   type: string,
-  page: string,
-  limit: string,
-  s: string
-  countPage: number,
-  parentId: string
 };
-const CategoryPage: React.FC<TProps> = ({
-  type, page, limit, s, countPage, parentId, 
-}) => {
-  const router = useRouter();
-  const { query } = router;
+const CategoryPage: React.FC<TProps> = ({ type }) => {
+  const  { treeCategory, isLoading, setKeyChangeCategory } = useTreeCategories(type);
   const { category } = useStore();
   const {
     showModal,
     listCategory,
     detailCategory,
-    selectCategories,
     actionCategory,
     actionSelectCategories,
     setShowModal,
     getCategoryById,
-    getCategories,
     addIdToListSortable,
     sortCategory,
     cloneCategory,
@@ -90,7 +59,6 @@ const CategoryPage: React.FC<TProps> = ({
   const [loadingClone, setLoadingClone] = useState<boolean[]>([]);
   const [loadingDeleteCategories, setLoadingDeleteCategories] = useState<boolean>(false);
   const [active, setActive] = useState<boolean>(false);
-  const typingTimeoutRef = useRef(null);
   const swappingTimeoutRef = useRef(null);
 
   const toggleModal = () => setActive(!active);
@@ -100,6 +68,7 @@ const CategoryPage: React.FC<TProps> = ({
       arrLoading[id] = true;
       setLoadingClone(arrLoading);
       await cloneCategory(id);
+      setKeyChangeCategory(makeid(8));
       toast.success('Clone success');
     } catch (error) {
       toast.error(toastErrorMessage(error.message));
@@ -121,6 +90,7 @@ const CategoryPage: React.FC<TProps> = ({
       detailCategory.setLoading(true);
       await deleteCategory();
       toggleModal();
+      setKeyChangeCategory(makeid(8));
       toast.success('Delete success');
     } catch (error) {
       toast.error(toastErrorMessage(error.message));
@@ -133,6 +103,7 @@ const CategoryPage: React.FC<TProps> = ({
     try {
       setLoadingDeleteCategories(true);
       await deleteCategories();
+      setKeyChangeCategory(makeid(8));
       toast.success('Delete success');
     } catch (error) {
       toast.error(toastErrorMessage(error.message));
@@ -166,6 +137,7 @@ const CategoryPage: React.FC<TProps> = ({
         await actionCategory();
         toast.success('Create success');
       }
+      setKeyChangeCategory(makeid(8));
       applySnapshot(detailCategory, {});
       setShowModal(false);
     } catch (error) {
@@ -184,15 +156,6 @@ const CategoryPage: React.FC<TProps> = ({
       applySnapshot(detailCategory, getSnapshot(item));
     }
   };
-  const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-    typingTimeoutRef.current = setTimeout(() => {
-      router.push({ query: { ...query, s: e.target.value, page: '1' } });
-    }, 1000);
-  };
-
 
   const headings = [
     {
@@ -216,13 +179,11 @@ const CategoryPage: React.FC<TProps> = ({
       label: 'Actions',
     },
   ];
-  const rows = listCategory.map((item) => [
+  const rows = treeCategory.map((item) => [
     <Form.Check type="checkbox" onChange={() => actionSelectCategories('select-category', item._id)} checked={checkSelectCategory(item._id)} />,
-    <Link href={{ query: { ...query, parentId: item._id, page: '1' } }}>
-      <a style={{ fontSize: '12px' }}>
-        {item.title}
-      </a>
-    </Link>
+    <Button size="sm" variant="link" onClick={() => fnOpenModal('edit', item._id)} style={{ textDecoration: 'none' }}>
+      {`${item.prefix || ''} ${item.title}`}
+    </Button>
     ,
     item.description,
     (
@@ -247,77 +208,25 @@ const CategoryPage: React.FC<TProps> = ({
       </ButtonGroup>
     )]);
 
-  
-  const run = async () => {
-    try {
-      setLoading(true);
-      await getCategories({ page, limit, s, parentId });
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    run();
-    return () => {
-      applySnapshot(detailCategory, {});
-      applySnapshot(selectCategories, []);
-    };
-  }, [page, limit, s, parentId]);
-
   return (
-    <AdminLayout title="Category Article">
+    <AdminLayout title={`Category ${type.charAt(0).toUpperCase() + type.slice(1)}`}>
       <Card>
-        <div className="d-flex justify-content-between">
-          <div>
-            <Button onClick={() => fnOpenModal('add')}>
-              <PlusSquare /> New Category
-            </Button>
-            <CustomButton variant="danger" className="mx-3" onClick={actionDeleteCategories} loading={loadingDeleteCategories}>
-              <Trash /> Delete
-            </CustomButton>
-          </div>
-          <div style={{ width: '50%' }}>
-            <Row>
-              <Col sm="8">
-                <Form.Control
-                  type="text"
-                  placeholder="Search..."
-                  className="mr-3"
-                  onChange={handleChangeSearch}
-                />
-              </Col>
-              <Col sm="4">
-                <Form.Select
-                  aria-label="Select Limit"
-                  onChange={(e: FormEvent<HTMLSelectElement>) => {
-                    const target = e.target as HTMLSelectElement;
-                    router.push({ query: { ...query, limit: target.value, page: '1' } });
-                  }}
-                >
-                  <option value="15">Choose limit</option>
-                  <option value="15">15</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                </Form.Select>
-              </Col>
-
-            </Row>
-          </div>
-        </div>
+        <Button onClick={() => fnOpenModal('add')}>
+          <PlusSquare /> New Category
+        </Button>
+        <CustomButton variant="danger" className="mx-3" onClick={actionDeleteCategories} loading={loadingDeleteCategories}>
+          <Trash /> Delete
+        </CustomButton>
       </Card>
       <DataTable
         headings={headings}
         rows={rows}
-        loading={false}
+        loading={isLoading}
         listenChange={addIdToListSortable}
         listenEnd={actionSortCategories}
         className="my-3"
       />
-      <CustomPagination countPage={countPage} currentPage={parseInt(page, 10)} limit={parseInt(limit, 10)} />
-      {showModal && <ModalCategory action={fnActionCategory} />}
+      {showModal && <ModalCategory type={type} title={typeAction === 'add' ? 'New Category' : 'Edit Category'} action={fnActionCategory} />}
       <ModalDeleteCategory active={active} toggleModal={toggleModal} action={actionDeleteCategory} />
     </AdminLayout>
   );

@@ -9,18 +9,18 @@ type TProps = {
   action: () => void,
 };
 const ModalDeleteCategory: React.FC<TProps> = ({ active, toggleModal, action }) => {
-  const { category } = useStore();
-  const { detailCategory } = category;
-  const { title, loading } = detailCategory;
+  const { tag } = useStore();
+  const { detailTag } = tag;
+  const { title, loading } = detailTag;
   return (
     <Modal
       show={active}
-      aria-labelledby="modal-remove-category"
+      aria-labelledby="modal-remove-tag"
       centered
     >
       <Modal.Header onHide={toggleModal} closeButton>
-        <Modal.Title id="modal-remove-category">
-          Delete Category
+        <Modal.Title id="modal-remove-tag">
+          Delete Tag
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>

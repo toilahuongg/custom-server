@@ -4,8 +4,9 @@ import {
   getArticleByQuery,
 } from '../controllers/ArticleController';
 import { register, login } from '../controllers/UserController';
-import { getCategoryByQuery, getListCategoryParent } from '../controllers/CategoryController';
-import { getImages } from '../controllers/LibraryController';
+import { getCategories } from '../controllers/CategoryController';
+import { getTags } from '../controllers/TagController';
+import { getImages, getImage } from '../controllers/LibraryController';
 
 const router = new Router();
 
@@ -23,13 +24,18 @@ router.use('/user', userRouter.routes());
 
 // Category
 const categoryRouter = new Router();
-categoryRouter.get('/', getCategoryByQuery);
-categoryRouter.get('/tree', getListCategoryParent);
+categoryRouter.get('/', getCategories);
 router.use('/category', categoryRouter.routes());
+
+// Tag
+const tagRouter = new Router();
+tagRouter.get('/', getTags);
+router.use('/tag', tagRouter.routes());
 
 // Library
 const libraryRouter = new Router();
 libraryRouter.get('/', getImages);
+libraryRouter.get('/:id', getImage);
 router.use('/library', libraryRouter.routes());
 
 export default router;

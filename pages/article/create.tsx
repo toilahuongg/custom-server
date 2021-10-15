@@ -9,20 +9,20 @@ import useStore from '@src/stores';
 const CreateArticlePage: React.FC = () => {
   const router = useRouter();
   const { article } = useStore();
-  const { detailArticle, setLoading, actionArticle } = article;
+  const { detailArticle, actionArticle } = article;
   const back = () => router.push('/article');
   const handleClick = (e: React.MouseEvent) => async (isPublish: boolean) => {
     try {
       e.preventDefault();
       console.log(isPublish);
-      setLoading(true);
+      detailArticle.setLoading(true);
       await actionArticle();
       toast.success('Success');
       back();
     } catch (error) {
       toast.error(error.message);
     } finally {
-      setLoading(false);
+      detailArticle.setLoading(false);
     }
   };
   useEffect(() => {

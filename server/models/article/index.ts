@@ -10,13 +10,15 @@ const ArticleSchema = new Schema<TArticle>({
   description: { type: String },
   content: { type: String },
   categories: [{ type: mongoose.Types.ObjectId, ref: 'Category' }],
+  tags: [{ type: mongoose.Types.ObjectId, ref: 'Tag' }],
   index: { type: Date, default: Date.now },
   slug: {
     type: String,
     index: true,
     unique: true,
   },
+  isPublish: { type: Boolean },
 }, { timestamps: true });
 
-const ArticleModel = mongoose.model<TArticle>('Article', ArticleSchema);
+const ArticleModel = mongoose.model('Article', ArticleSchema);
 export default ArticleModel;

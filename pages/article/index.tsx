@@ -26,6 +26,7 @@ import ModalDeleteArticle from '@src/components/Article/ModalDeleteArticle';
 import CustomButton from '@src/components/Layout/Button';
 import CustomPagination from '@src/components/Layout/Pagination';
 import { toastErrorMessage } from '@src/helper/common';
+import { useTreeCategories } from '@src/hooks';
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
   const db = await database();
@@ -47,19 +48,21 @@ type TProps = {
   page: string,
   limit: string,
   s: string
-  countPage: number
+  category: string,
+  countPage: number,
 };
 
-const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
+const ArticlePage: React.FC<TProps> = ({
+  page, limit, s, category: cat, countPage, 
+}) => {
   const router = useRouter();
   const { query } = router;
   const [active, setActive] = useState<boolean>(false);
   const [loadingClone, setLoadingClone] = useState<boolean[]>([]);
   const [loadingDeleteArticles, setLoadingDeleteArticles] = useState<boolean>(false);
-  const [treeCategory, setTreeCategory] = useState([]);
   const typingTimeoutRef = useRef(null);
   const swappingTimeoutRef = useRef(null);
-  const { article, category } = useStore();
+  const { article } = useStore();
   const {
     loading,
     listArticle,
@@ -76,7 +79,6 @@ const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
     checkSelectArticle,
     checkSelectAll,
   } = article;
-  const { getTreeCategories } = category;
   const toggleModal = () => setActive(!active);
 
   const handleClickDelete = (id: string) => {
@@ -207,7 +209,7 @@ const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
   const run = async () => {
     try {
       setLoading(true);
-      await getArticles({ page, limit, s, category });
+      await getArticles({ page, limit, s, category: cat });
     } catch (error) {
       console.log(error);
     } finally {
@@ -221,19 +223,9 @@ const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
       applySnapshot(detailArticle, {});
       applySnapshot(selectArticles, []);
     };
-  }, [page, limit, s, category]);
+  }, [page, limit, s, cat]);
 
-  useEffect(() => {
-    const run = async () => {
-      try {
-        const options = await getTreeCategories();
-        setTreeCategory(options);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    run();
-  }, []);
+  const { treeCategory } = useTreeCategories('article');
 
   return (
     <AdminLayout title="List Article">
@@ -283,7 +275,7 @@ const ArticlePage: React.FC<TProps> = ({ page, limit, s, countPage }) => {
                 >
                   <option value="">Choose Category</option>
                   {
-                    treeCategory.map((option) => <option value={option.value} key={option.value}> {option.label} </option>)
+                    treeCategory.map((option) => <option value={option._id} key={option._id}> {option.prefix} {option.title} </option>)
                   }
                 </Form.Select>
               </Col>

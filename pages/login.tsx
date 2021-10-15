@@ -3,7 +3,7 @@ import React, { FormEvent } from 'react';
 import { Card, Form } from 'react-bootstrap';
 import CustomButton from '@src/components/Layout/Button';
 import CustomHead from '@src/components/Layout/CustomHead';
-import { useUser } from '@src/hooks/user';
+import { useUser } from '@src/hooks';
 
 const LoginPage: React.FC = () => {
   const {

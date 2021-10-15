@@ -7,7 +7,7 @@ const CategorySchema = new Schema<TCategory>({
     required: true,
   },
   description: { type: String },
-  parentId: { type: mongoose.Types.ObjectId, transform: (v: any) => (v == null ? '' : v) },
+  parent: { type: mongoose.Types.ObjectId, ref: 'Category' },
   slug: {
     type: String,
     index: true,

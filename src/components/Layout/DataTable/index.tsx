@@ -14,7 +14,7 @@ type TProps = React.HTMLAttributes<HTMLElement> & {
   rows: Row[][],
   loading?: boolean,
   listenChange: ({ oldIndex, newIndex }) => void,
-  listenEnd: () => Promise<void>,
+  listenEnd?: () => Promise<void>,
 };
 
 const DataTable: React.FC<TProps> = ({

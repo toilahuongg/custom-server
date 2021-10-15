@@ -1,12 +1,13 @@
 type TCategory = {
-  _id: string,
+  _id?: string,
   title: string,
-  description: string,
+  description?: string,
   type: string,
-  parentId: string,
+  parent?: string,
+  children?: [string],
   slug: string,
   index: number,
-  createdAt: string,
-  updatedAt: string,
+  createdAt?: string,
+  updatedAt?: string,
 };
 export default TCategory;

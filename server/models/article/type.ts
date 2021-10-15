@@ -7,6 +7,7 @@ type TArticle = {
   slug: string,
   index: string,
   categories: string[],
+  tags: string[],
   createdAt: string,
   updatedAt: string,
 };

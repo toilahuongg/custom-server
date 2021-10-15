@@ -11,6 +11,7 @@ import SidebarEditor, { TMenu } from '../Editor/SidebarEditor';
 import { useRouter } from 'next/router';
 import TabCategories from './Tabs/TabCategories';
 import TabFeaturedImage from './Tabs/TabFeaturedImage';
+import TabTags from './Tabs/TabTags';
 
 type TProps = {
   title: string;
@@ -39,6 +40,11 @@ const ArticleLayout: React.FC<TProps> = ({ title: titlePage, txtSave, onSave }) 
     },
     {
       id: '2',
+      title: 'Tags',
+      render: <TabTags />,
+    },
+    {
+      id: '3',
       title: 'Featured Image',
       render:  <TabFeaturedImage />,
     },

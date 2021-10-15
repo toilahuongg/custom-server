@@ -34,6 +34,11 @@ const Sidebar: React.FC = () => {
           title: 'Chuyên mục',
           url: '/category/article',
         },
+        {
+          id: '1.3',
+          title: 'Thẻ',
+          url: '/tag/article',
+        },
       ],
     },
     {

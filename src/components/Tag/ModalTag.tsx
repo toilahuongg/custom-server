@@ -4,28 +4,27 @@ import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import useStore from '../../stores';
 import CustomButton from '../Layout/Button';
-import FormCategory from './FormCategory';
+import FormTag from './FormTag';
 
 type TProps = {
-  type: string;
-  title: string;
+  title: string,
   action: () => Promise<void>;
 };
-const ModalCategory: React.FC<TProps> = ({ type, title, action }) => {
-  const { category } = useStore();
-  const { showModal, setShowModal, detailCategory } = category;
-  const { loading } = detailCategory;
+const ModalTag: React.FC<TProps> = ({ title, action }) => {
+  const { tag } = useStore();
+  const { showModal, setShowModal, detailTag } = tag;
+  const { loading } = detailTag;
   const fnCloseModal = () => {
     setShowModal(false);
-    applySnapshot(detailCategory, {});
+    applySnapshot(detailTag, {});
   };
   return (
     <Modal show={showModal} size="lg" onHide={fnCloseModal}>
       <Modal.Header closeButton>
-        <Modal.Title>{title}</Modal.Title>
+        <Modal.Title>{ title }</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <FormCategory type={type} />
+        <FormTag />
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={fnCloseModal}>
@@ -39,4 +38,4 @@ const ModalCategory: React.FC<TProps> = ({ type, title, action }) => {
   );
 };
 
-export default observer(ModalCategory);
+export default observer(ModalTag);

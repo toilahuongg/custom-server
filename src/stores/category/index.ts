@@ -9,8 +9,9 @@ const CategoryModel = types.model({
   description: types.optional(types.string, ''),
   type: types.optional(types.string, ''),
   index: types.optional(types.number, 0),
-  parentId: types.maybeNull(types.optional(types.string, '')),
+  parent: types.maybeNull(types.optional(types.string, '')),
   articles: types.array(types.optional(types.string, '')),
+  slug: types.optional(types.string, ''),
   createdAt: types.optional(types.string, ''),
   updatedAt: types.optional(types.string, ''),
 })
@@ -19,7 +20,7 @@ const CategoryModel = types.model({
     setLoading: (value: boolean) => { self.loading = value; },
     setTitle: (value: string) => { self.title = value; },
     setDescription: (value: string) => { self.description = value; },
-    setParentId: (value: string) => { self.parentId = value; },
+    setParent: (value: string) => { self.parent = value; },
     setType: (value: string) => { self.type = value; },
   }));
 export const CategoryModels = types.model({
@@ -42,9 +43,9 @@ export const CategoryModels = types.model({
     setDetailCategory: (item) => {
       self.detailCategory = item;
     },
-    getCategories: flow(function* ({ page, limit, s, parentId }) {
+    getCategories: flow(function* () {
       try {
-        const response = yield instance.get('/category', { params: { page, limit, s, parentId } });
+        const response = yield instance.get('/category');
         self.listCategory = response.data;
       } catch (error) {
         console.log(error);
@@ -55,7 +56,10 @@ export const CategoryModels = types.model({
       try {
         const data = getSnapshot(self.detailCategory);
         yield instance.delete(`/category/${data._id}`);
-        self.listCategory = cast(self.listCategory.filter((category) => category._id !== data._id));
+        self.listCategory = cast(self.listCategory.filter((category) => {
+          if (category.parent === data._id) category.setParent(data.parent);
+          return category._id !== data._id;
+        }));
       } catch (error) {
         console.log(error);
         throw (error);
@@ -65,7 +69,14 @@ export const CategoryModels = types.model({
       try {
         const data = getSnapshot(self.selectCategories);
         yield instance.delete('/category/', { data });
-        self.listCategory = cast(self.listCategory.filter((category) => !data.includes(category._id)));
+        self.listCategory = cast(self.listCategory.filter((category) => {
+          const idx = data.findIndex((id) => id === category.parent);
+          if (idx >= 0) {
+            const current = self.listCategory.find(({ _id }) => _id === data[idx]);
+            category.setParent(current.parent);
+          }
+          return !data.includes(category._id);
+        }));
         self.selectCategories = cast([]);
       } catch (error) {
         console.log(error);
@@ -87,18 +98,14 @@ export const CategoryModels = types.model({
     actionCategory: flow(function* (type?: string) {
       try {
         const data = getSnapshot(self.detailCategory);
+        const { title, description, type: t, parent  } = data;
         if (type === 'edit') {
-          yield instance.put(`/category/${data._id}`, data);
+          yield instance.put(`/category/${data._id}`, { title, description, type: t, parent  });
           const idx = self.listCategory.findIndex((item) => item._id === data._id);
-          if (idx !== -1) {
-            if (self.listCategory[idx].parentId !== data.parentId && data.parentId !== null)
-              self.listCategory.splice(idx, 1);
-            else
-              applySnapshot(self.listCategory[idx], data);
-          }
+          if (idx >= 0) applySnapshot(self.listCategory[idx], data);
         } else {
-          const response = yield instance.post('/category', data);
-          if (!data.parentId) self.listCategory.unshift(response.data);
+          const response = yield instance.post('/category', { title, description, type: t, parent  });
+          self.listCategory.unshift(response.data);
         }
       } catch (error) {
         console.error(error);
@@ -144,8 +151,17 @@ export const CategoryModels = types.model({
     },
   }))
   .views((self) => ({
+    getListCategory: () => {
+      return getSnapshot(self.listCategory);
+    },
     getCategoryById: (id: string) => {
-      return self.listCategory.find((item) => item._id === id);
+      return getSnapshot(self.listCategory).find((item) => item._id === id);
+    },
+    getCategoryByType: (type: string) => {
+      return getSnapshot(self.listCategory).filter((item) => item.type === type);
+    },
+    countCategory: () => {
+      return getSnapshot(self.listCategory).length;
     },
     checkSelectCategory: (id: string) => {
       return self.selectCategories.includes(id);
@@ -154,38 +170,6 @@ export const CategoryModels = types.model({
       const listId = self.listCategory.map((item) => item._id);
       return self.selectCategories.length > 0 && self.selectCategories.length === listId.length;
     },
-    getTreeCategories: (type = 'option'): Promise<any[]> => new Promise(async (resolve, reject) => {
-      try {
-        const response = await instance.get('/category/tree');
-        const options = [];
-        const addOptionToArray = (categories: any[], prefix = '') => {
-          categories.forEach(({ _id, title, childrens }) => {
-            if (type === 'checkbox') {
-              const option = {
-                label: title,
-                prefix,
-                value: _id,
-              };
-              options.push(option);
-              if (childrens.length > 0) addOptionToArray(childrens, `${parseInt(prefix || '0') + 1}`);
-            } else {
-              if (self.detailCategory._id !== _id) {
-                const option = {
-                  label: prefix + ' ' + title,
-                  value: _id,
-                };
-                options.push(option);
-                if (childrens.length > 0) addOptionToArray(childrens, `${prefix}--`);
-              } 
-            }
-          });
-        };
-        addOptionToArray(response.data);
-        resolve(options);
-      } catch (error) {
-        reject(error);
-      }
-    }),
   }));
 
 export interface ICategoryModel extends Instance<typeof CategoryModel> {}

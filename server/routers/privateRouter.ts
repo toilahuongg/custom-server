@@ -15,6 +15,12 @@ import {
   putCategory,
   swapCategory, 
 } from '../controllers/CategoryController';
+import {
+  deleteTags,
+  deleteTag,
+  postTag,
+  putTag,
+} from '../controllers/TagController';
 import { uploadSingle, removeImage } from '../controllers/LibraryController';
 import multer from '@koa/multer';
 const upload = multer();
@@ -43,6 +49,14 @@ categoryRouter.delete('/:id', deleteCategory);
 categoryRouter.delete('/', deleteCategories);
 categoryRouter.post('/swap', swapCategory);
 router.use('/category', categoryRouter.routes());
+
+// Tag
+const tagRouter = new Router();
+tagRouter.post('/', postTag);
+tagRouter.put('/:id', putTag);
+tagRouter.delete('/:id', deleteTag);
+tagRouter.delete('/', deleteTags);
+router.use('/tag', tagRouter.routes());
 
 // Library
 const libraryRouter = new Router();

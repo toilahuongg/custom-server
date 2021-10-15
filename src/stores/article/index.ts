@@ -12,6 +12,7 @@ export const ArticleModel = types.model({
   index: types.optional(types.string, ''),
   slug: types.optional(types.string, ''),
   categories: types.array(types.optional(types.string, '')),
+  tags: types.array(types.optional(types.string, '')),
   createdAt: types.optional(types.string, ''),
   updatedAt: types.optional(types.string, ''),
 })
@@ -28,6 +29,9 @@ export const ArticleModel = types.model({
       const idx = self.categories.indexOf(id);
       if (idx >= 0) self.categories.splice(idx, 1);
       else self.categories.push(id);
+    },
+    setTags(ids: string[]) {
+      self.tags = cast(ids);
     },
   }))
   .views((self) => ({
@@ -49,7 +53,6 @@ export const ArticleModels = types.model({
     getArticles: flow(function* (params) {
       try {
         const response = yield instance.get('/article', { params });
-        console.log(response.data);
         self.listArticle = response.data;
       } catch (error) {
         console.log(error);
@@ -145,8 +148,8 @@ export const ArticleModels = types.model({
       return self.selectArticles.length > 0 && self.selectArticles.length === listId.length;
     },
   }));
-export interface IArticleModel extends Instance<typeof ArticleModel> { }
-export interface IArticleModelOut extends SnapshotOut<typeof ArticleModel> { }
+export interface IArticleModel extends Instance<typeof ArticleModel> {}
+export interface IArticleModelOut extends SnapshotOut<typeof ArticleModel> {}
 
-export interface IArticleModels extends Instance<typeof ArticleModels> { }
-export interface IArticleModelsOut extends SnapshotOut<typeof ArticleModels> { }
+export interface IArticleModels extends Instance<typeof ArticleModels> {}
+export interface IArticleModelsOut extends SnapshotOut<typeof ArticleModels> {}

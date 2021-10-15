@@ -17,7 +17,6 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
   const { params } = context;
   const { id } = params;
   const response = await db.models.Article.findById(id).lean();
-  console.log(response);
   if (!response) {
     return { notFound: true };
   }
@@ -29,20 +28,20 @@ type TProps = {
 };
 const EditArticlePage: React.FC<TProps> = ({ item }) => {
   const { article } = useStore();
-  const { detailArticle, setLoading, actionArticle } = article;
+  const { detailArticle, actionArticle } = article;
 
   const handleClick =  (e: React.MouseEvent) => async (isPublish: boolean) => {
     try {
       console.log(isPublish);
       e.preventDefault();
-      setLoading(true);
+      detailArticle.setLoading(true);
       await actionArticle('edit');
       toast.success('Success');
     } catch (error) {
       console.log(error);
       toast.error(error.message);
     } finally {
-      setLoading(false);
+      detailArticle.setLoading(false);
     }
   };
 
